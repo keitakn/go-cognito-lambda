@@ -13,3 +13,13 @@
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+
+# IDE Setting Files
+.idea/
+
+# output go build
+bin/
+packaged.yaml
+
+# goenv
+.go-version
