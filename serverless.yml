@@ -2,6 +2,9 @@ service: go-cognito-lambda
 
 frameworkVersion: '>=1.28.0 <2.0.0'
 
+plugins:
+  - serverless-prune-plugin
+
 provider:
   name: aws
   runtime: go1.x

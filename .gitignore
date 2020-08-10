@@ -30,3 +30,6 @@ packaged.yaml
 # env file
 .env
 .envrc
+
+# node_modules
+node_modules

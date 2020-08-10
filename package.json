@@ -1,0 +1,22 @@
+{
+  "name": "go-cognito-lambda",
+  "version": "1.0.0",
+  "description": "Cognito UserPool Custom Lambda Sample",
+  "scripts": {
+    "deploy": "serverless deploy -v"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/keitakn/go-cognito-lambda.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/keitakn/go-cognito-lambda/issues"
+  },
+  "homepage": "https://github.com/keitakn/go-cognito-lambda#readme",
+  "devDependencies": {
+    "serverless": "^1.78.1",
+    "serverless-prune-plugin": "^1.4.3"
+  }
+}
