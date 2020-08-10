@@ -26,3 +26,7 @@ packaged.yaml
 
 # Serverless directories
 .serverless
+
+# env file
+.env
+.envrc
