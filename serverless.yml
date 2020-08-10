@@ -1,0 +1,44 @@
+service: go-cognito-lambda
+
+frameworkVersion: '>=1.28.0 <2.0.0'
+
+provider:
+  name: aws
+  runtime: go1.x
+  stage: ${env:DEPLOY_STAGE}
+  region: ap-northeast-1
+  profile: ${self:custom.profiles.${self:provider.stage}}
+  logRetentionInDays: 3
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+  environment:
+    DEPLOY_STAGE: ${env:DEPLOY_STAGE}
+    TARGET_USER_POOL_ID: ${env:TARGET_USER_POOL_ID}
+
+custom:
+  defaultStage: dev
+  profiles:
+    dev: nekochans-dev
+  prune:
+    automatic: true
+    number: 3
+
+package:
+  exclude:
+    - ./**
+  include:
+    - ./bin/**
+
+functions:
+  customMessage:
+    handler: bin/message
+    events:
+      - cognitoUserPool:
+          pool: dev-keitakn-user-pool
+          trigger: CustomMessage
+          existing: true

@@ -23,3 +23,6 @@ packaged.yaml
 
 # goenv
 .go-version
+
+# Serverless directories
+.serverless
