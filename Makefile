@@ -15,3 +15,6 @@ remove:
 
 test:
 	go test -v ./...
+
+format:
+	gofmt -l -s -w .
