@@ -3,7 +3,8 @@
   "version": "1.0.0",
   "description": "Cognito UserPool Custom Lambda Sample",
   "scripts": {
-    "deploy": "serverless deploy -v"
+    "deploy": "serverless deploy -v",
+    "remove": "serverless remove -v"
   },
   "repository": {
     "type": "git",

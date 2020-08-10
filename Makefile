@@ -8,7 +8,10 @@ clean:
 	rm -rf ./bin
 
 deploy: clean build
-	sls deploy --verbose
+	npm run deploy
+
+remove:
+	npm run remove
 
 test:
 	go test -v ./...
