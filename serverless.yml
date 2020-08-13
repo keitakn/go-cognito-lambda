@@ -42,6 +42,6 @@ functions:
     handler: bin/message
     events:
       - cognitoUserPool:
-          pool: dev-keitakn-user-pool
+          pool: ${env:TRIGGER_USER_POOL_NAME}
           trigger: CustomMessage
           existing: true
