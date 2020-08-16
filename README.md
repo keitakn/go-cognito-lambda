@@ -71,3 +71,22 @@ deployは [Serverless Framework](https://www.serverless.com/) を利用してい
 ## ソースコードのformat
 
 `make format`
+
+# 開発を行う為の参考資料
+
+Cognitoをカスタマイズする為のLambdaは以下の種類が存在します。
+
+- カスタム認証フロー
+- 認証イベント
+- サインアップ
+- メッセージ
+- トークンの作成
+
+詳しくは [こちら](https://docs.aws.amazon.com/ja_jp/cognito/latest/developerguide/cognito-user-identity-pools-working-with-aws-lambda-triggers.html) を見て下さい。
+
+また `serverless.yml` にトリガーにCognitoのイベントを設定する必要があります。
+
+それに関しては下記のドキュメントが参考になります。
+
+- https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#cognito
+- https://docs.aws.amazon.com/ja_jp/AWSCloudFormation/latest/UserGuide/aws-properties-cognito-userpool-lambdaconfig.html
