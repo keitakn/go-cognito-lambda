@@ -1,141 +1,73 @@
 # go-cognito-lambda
 CognitoUserPoolをトリガーとしたLambdaのサンプル色々
 
-This is a sample template for sam-app - Below is a brief explanation of what we have generated for you:
+# Getting Started
 
-```bash
-.
-├── Makefile                    <-- Make to automate build
-├── README.md                   <-- This instructions file
-├── helloworld                  <-- Source code for a lambda function
-│   ├── main.go                 <-- Lambda function code
-│   └── main_test.go            <-- Unit tests
-└── template.yaml
+## 環境変数の設定
+
+以下の環境変数を設定して下さい。
+
+[direnv/direnv](https://github.com/direnv/direnv) 等を利用するのがオススメです。
+
+```
+export DEPLOY_STAGE=デプロイターゲット（.eg. dev, stg, prod）
+export TARGET_USER_POOL_ID=ターゲットとなるUserPoolのID
+export TRIGGER_USER_POOL_NAME=ターゲットとなるUserPoolの名前
+export REGION=AWSのリージョン（.eg. ap-northeast-1）
 ```
 
-## Requirements
+## AWSクレデンシャルの設定
 
-* AWS CLI already configured with Administrator permission
-* [Docker installed](https://www.docker.com/community-edition)
-* [Golang](https://golang.org)
-* SAM CLI - [Install the SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+従って以下のように [名前付きプロファイル](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-profiles.html) を作成して下さい。
 
-## Setup process
+`~/.aws/credentials`
 
-### Installing dependencies & building the target 
-
-In this example we use the built-in `sam build` to automatically download all the dependencies and package our build target.   
-Read more about [SAM Build here](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) 
-
-The `sam build` command is wrapped inside of the `Makefile`. To execute this simply run
- 
-```shell
-make
+```
+[nekochans-dev]
+aws_access_key_id=YOUR_AWS_ACCESS_KEY_ID
+aws_secret_access_key=YOUR_AWS_SECRET_ACCESS_KEY
 ```
 
-### Local development
+無論このプロファイル名は好きな名前に変えてもらって問題ありません。
 
-**Invoking function locally through local API Gateway**
+その場合は `serverless.yml` 内の `custom.profiles` を全て修正して下さい。
 
-```bash
-sam local start-api
-```
+## Goのインストール
 
-If the previous command ran successfully you should now be able to hit the following local endpoint to invoke your function `http://localhost:3000/hello`
+`go1.14` をインストールします。
 
-**SAM CLI** is used to emulate both Lambda and API Gateway locally and uses our `template.yaml` to understand how to bootstrap this environment (runtime, where the source code is, etc.) - The following excerpt is what the CLI will read in order to initialize an API and its routes:
+## Node.jsのインストール
 
-```yaml
-...
-Events:
-    HelloWorld:
-        Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
-        Properties:
-            Path: /hello
-            Method: get
-```
+最新安定版をインストールします。
 
-## Packaging and deployment
+## npm packageのインストール
 
-AWS Lambda Golang runtime requires a flat folder with the executable generated on build step. SAM will use `CodeUri` property to know where to look up for the application:
+`npm ci` を実行してpackageをインストールします。
 
-```yaml
-...
-    FirstFunction:
-        Type: AWS::Serverless::Function
-        Properties:
-            CodeUri: helloworld/
-            ...
-```
+# デプロイ関連のコマンド
 
-To deploy your application for the first time, run the following in your shell:
+## Build & Deploy
 
-```bash
-sam deploy --guided
-```
+`make deploy` を実行すると `build` , `deploy` が実行されます。
 
-The command will package and deploy your application to AWS, with a series of prompts:
+deployは [Serverless Framework](https://www.serverless.com/) を利用しています。
 
-* **Stack Name**: The name of the stack to deploy to CloudFormation. This should be unique to your account and region, and a good starting point would be something matching your project name.
-* **AWS Region**: The AWS region you want to deploy your app to.
-* **Confirm changes before deploy**: If set to yes, any change sets will be shown to you before execution for manual review. If set to no, the AWS SAM CLI will automatically deploy application changes.
-* **Allow SAM CLI IAM role creation**: Many AWS SAM templates, including this example, create AWS IAM roles required for the AWS Lambda function(s) included to access AWS services. By default, these are scoped down to minimum required permissions. To deploy an AWS CloudFormation stack which creates or modified IAM roles, the `CAPABILITY_IAM` value for `capabilities` must be provided. If permission isn't provided through this prompt, to deploy this example you must explicitly pass `--capabilities CAPABILITY_IAM` to the `sam deploy` command.
-* **Save arguments to samconfig.toml**: If set to yes, your choices will be saved to a configuration file inside the project, so that in the future you can just re-run `sam deploy` without parameters to deploy changes to your application.
+このツールを利用すると、既存のCognitoUserPoolに対してLambda関数をアタッチ出来るので、その機能を利用する事が主な目的です。
 
-You can find your API Gateway Endpoint URL in the output values displayed after deployment.
+それ以外にも公式の [AWS SAM](https://docs.aws.amazon.com/ja_jp/serverless-application-model/latest/developerguide/serverless-sam-reference.html) と比較して痒いところに手が届くので、その点も良いと思います。
 
-### Testing
+- （参考）[Serverless Frameworkの使い方まとめ](https://qiita.com/horike37/items/b295a91908fcfd4033a2)
 
-We use `testing` package that is built-in in Golang and you can simply run the following command to run our tests:
+## deployしたリソースを削除する
 
-```shell
-go test -v ./helloworld/
-```
-# Appendix
+`make remove` を実行します。
 
-### Golang installation
+# その他のコマンド
 
-Please ensure Go 1.x (where 'x' is the latest version) is installed as per the instructions on the official golang website: https://golang.org/doc/install
+## テスト実行
 
-A quickstart way would be to use Homebrew, chocolatey or your linux package manager.
+`make test`
 
-#### Homebrew (Mac)
+## ソースコードのformat
 
-Issue the following command from the terminal:
-
-```shell
-brew install golang
-```
-
-If it's already installed, run the following command to ensure it's the latest version:
-
-```shell
-brew update
-brew upgrade golang
-```
-
-#### Chocolatey (Windows)
-
-Issue the following command from the powershell:
-
-```shell
-choco install golang
-```
-
-If it's already installed, run the following command to ensure it's the latest version:
-
-```shell
-choco upgrade golang
-```
-
-## Bringing to the next level
-
-Here are a few ideas that you can use to get more acquainted as to how this overall process works:
-
-* Create an additional API resource (e.g. /hello/{proxy+}) and return the name requested through this new path
-* Update unit test to capture that
-* Package & Deploy
-
-Next, you can use the following resources to know more about beyond hello world samples and how others structure their Serverless applications:
-
-* [AWS Serverless Application Repository](https://aws.amazon.com/serverless/serverlessrepo/)
+`make format`
