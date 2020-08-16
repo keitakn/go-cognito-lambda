@@ -23,3 +23,13 @@ packaged.yaml
 
 # goenv
 .go-version
+
+# Serverless directories
+.serverless
+
+# env file
+.env
+.envrc
+
+# node_modules
+node_modules
