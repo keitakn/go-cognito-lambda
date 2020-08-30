@@ -15,7 +15,7 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 	}
 
 	// サインアップ時に送られる認証メール
-	if request.TriggerSource == "CustomMessage_SignUp" {
+	if request.TriggerSource == "CustomMessage_SignUp" || request.TriggerSource == "CustomMessage_ResendCode" {
 		signupMessageResponse := events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage: "認証コードは {####} です。",
 			EmailMessage: "メールアドレスを検証するには、次のリンクをクリックしてください。 " +
