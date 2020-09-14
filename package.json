@@ -17,7 +17,7 @@
   },
   "homepage": "https://github.com/keitakn/go-cognito-lambda#readme",
   "devDependencies": {
-    "serverless": "^1.78.1",
+    "serverless": "^1.83.0",
     "serverless-prune-plugin": "^1.4.3"
   }
 }
