@@ -26,6 +26,17 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 		request.Response = signupMessageResponse
 	}
 
+	if request.TriggerSource == "CustomMessage_ForgotPassword" {
+		forgotPasswordMessageResponse := events.CognitoEventUserPoolsCustomMessageResponse{
+			SMSMessage: "認証コードは {####} です。",
+			EmailMessage: "次のリンクをクリックして、パスワードのリセットを完了させて下さい。 " +
+				"http://localhost:3900/cognito/password/reset/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
+			EmailSubject: "パスワードをリセットします。",
+		}
+
+		request.Response = forgotPasswordMessageResponse
+	}
+
 	return request, nil
 }
 
