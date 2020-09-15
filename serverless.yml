@@ -1,6 +1,6 @@
 service: go-cognito-lambda
 
-frameworkVersion: '>=1.28.0 <2.0.0'
+frameworkVersion: '>=2.0.0 <3.0.0'
 
 plugins:
   - serverless-prune-plugin
