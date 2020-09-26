@@ -34,7 +34,7 @@ aws_secret_access_key=YOUR_AWS_SECRET_ACCESS_KEY
 
 ## Goのインストール
 
-`go1.14` をインストールします。
+`go1.15` をインストールします。
 
 ## Node.jsのインストール
 
