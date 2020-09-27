@@ -14,15 +14,21 @@ var templates *template.Template
 
 func init() {
 	signupTemplatePath := "bin/signup-template.html"
+	forgotPasswordTemplatePath := "bin/forgot-password-template.html"
 	if infrastructure.IsTestRun() {
 		currentDir, _ := os.Getwd()
 		signupTemplatePath = currentDir + "/signup-template.html"
+		forgotPasswordTemplatePath = currentDir + "/forgot-password-template.html"
 	}
 
-	templates = template.Must(template.ParseFiles(signupTemplatePath))
+	templates = template.Must(template.ParseFiles(signupTemplatePath, forgotPasswordTemplatePath))
 }
 
 type SignupMessage struct {
+	ConfirmUrl string
+}
+
+type ForgotPasswordMessage struct {
 	ConfirmUrl string
 }
 
@@ -30,6 +36,17 @@ func BuildSignupMessage(sm SignupMessage) (*bytes.Buffer, error) {
 	var bodyBuffer bytes.Buffer
 
 	err := templates.ExecuteTemplate(&bodyBuffer, "signup-template.html", sm)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bodyBuffer, nil
+}
+
+func BuildForgotPasswordMessage(fm ForgotPasswordMessage) (*bytes.Buffer, error) {
+	var bodyBuffer bytes.Buffer
+
+	err := templates.ExecuteTemplate(&bodyBuffer, "forgot-password-template.html", fm)
 	if err != nil {
 		return nil, err
 	}
@@ -67,10 +84,19 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 	}
 
 	if request.TriggerSource == "CustomMessage_ForgotPassword" {
+		fm := ForgotPasswordMessage{
+			ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
+		}
+
+		body, err := BuildForgotPasswordMessage(fm)
+		if err != nil {
+			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+			log.Fatalln(err)
+		}
+
 		forgotPasswordMessageResponse := events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage: "認証コードは {####} です。",
-			EmailMessage: "次のリンクをクリックして、パスワードのリセットを完了させて下さい。 " +
-				"http://localhost:3900/cognito/password/reset/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
+			SMSMessage:   "認証コードは {####} です。",
+			EmailMessage: body.String(),
 			EmailSubject: "パスワードをリセットします。",
 		}
 
