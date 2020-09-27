@@ -1,12 +1,50 @@
 package main
 
 import (
+	"bytes"
+	"html/template"
 	"os"
 	"reflect"
 	"testing"
 
 	"github.com/aws/aws-lambda-go/events"
 )
+
+// SignUpカスタムメッセージのテスト用期待値を作成する
+func createExpectedSignUpMessage(sm SignupMessage) (*bytes.Buffer, error) {
+	t := template.New("signup-template.html")
+
+	currentDir, _ := os.Getwd()
+	templatePath := currentDir + "/signup-template.html"
+
+	templates := template.Must(t.ParseFiles(templatePath))
+
+	var bodyBuffer bytes.Buffer
+	err := templates.Execute(&bodyBuffer, sm)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bodyBuffer, nil
+}
+
+// ForgotPasswordMessageカスタムメッセージのテスト用期待値を作成する
+func createExpectedForgotPasswordMessageMessage(fm ForgotPasswordMessage) (*bytes.Buffer, error) {
+	t := template.New("forgot-password-template.html")
+
+	currentDir, _ := os.Getwd()
+	templatePath := currentDir + "/forgot-password-template.html"
+
+	templates := template.Must(t.ParseFiles(templatePath))
+
+	var bodyBuffer bytes.Buffer
+	err := templates.Execute(&bodyBuffer, fm)
+	if err != nil {
+		return nil, err
+	}
+
+	return &bodyBuffer, nil
+}
 
 func TestHandler(t *testing.T) {
 	// TriggerSourceが 'CustomMessage_SignUp' の場合はCustomMessageが返却される
@@ -57,9 +95,16 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
+		sm := SignupMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+
+		body, err := createExpectedSignUpMessage(sm)
+		if err != nil {
+			t.Fatal("Error Failed to parse HTML Template", err)
+		}
+
 		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: "メールアドレスを検証するには、次のリンクをクリックしてください。 http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn",
+			EmailMessage: body.String(),
 			EmailSubject: "サインアップ メールアドレスの確認をお願いします。",
 		}
 
@@ -116,9 +161,16 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
+		sm := SignupMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+
+		body, err := createExpectedSignUpMessage(sm)
+		if err != nil {
+			t.Fatal("Error Failed to parse HTML Template", err)
+		}
+
 		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: "メールアドレスを検証するには、次のリンクをクリックしてください。 http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn",
+			EmailMessage: body.String(),
 			EmailSubject: "サインアップ メールアドレスの確認をお願いします。",
 		}
 
@@ -175,9 +227,16 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
+		fm := ForgotPasswordMessage{ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=123456789&sub=keitakn"}
+
+		body, err := createExpectedForgotPasswordMessageMessage(fm)
+		if err != nil {
+			t.Fatal("Error Failed to parse HTML Template", err)
+		}
+
 		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: "次のリンクをクリックして、パスワードのリセットを完了させて下さい。 http://localhost:3900/cognito/password/reset/confirm?code=123456789&sub=keitakn",
+			EmailMessage: body.String(),
 			EmailSubject: "パスワードをリセットします。",
 		}
 
