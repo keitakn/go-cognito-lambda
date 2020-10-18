@@ -24,6 +24,12 @@ provider:
     TARGET_USER_POOL_ID: ${env:TARGET_USER_POOL_ID}
   httpApi:
     cors: true
+    authorizers:
+      adminJwtAuthorizer:
+        identitySource: $request.header.Authorization
+        issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/${env:TARGET_USER_POOL_ID}
+        audience:
+          - ${env:NEXT_IDAAS_SERVER_CLIENT_ID}
 
 custom:
   defaultStage: dev
@@ -53,3 +59,7 @@ functions:
       - httpApi:
           method: PATCH
           path: /users/passwords
+          authorizer:
+            name: adminJwtAuthorizer
+            scopes:
+              - ${env:DEPLOY_STAGE}-cognito-admin-api/admin
