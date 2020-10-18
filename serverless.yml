@@ -22,6 +22,8 @@ provider:
   environment:
     DEPLOY_STAGE: ${env:DEPLOY_STAGE}
     TARGET_USER_POOL_ID: ${env:TARGET_USER_POOL_ID}
+  httpApi:
+    cors: true
 
 custom:
   defaultStage: dev
@@ -45,3 +47,9 @@ functions:
           pool: ${env:TRIGGER_USER_POOL_NAME}
           trigger: CustomMessage
           existing: true
+  changePassword:
+    handler: bin/change-password
+    events:
+      - httpApi:
+          method: PATCH
+          path: /users/passwords
