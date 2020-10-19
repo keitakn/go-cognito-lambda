@@ -9,7 +9,7 @@ provider:
   name: aws
   runtime: go1.x
   stage: ${env:DEPLOY_STAGE}
-  region: ap-northeast-1
+  region: ${env:REGION}
   profile: ${self:custom.profiles.${self:provider.stage}}
   logRetentionInDays: 3
   iamRoleStatements:
@@ -27,7 +27,7 @@ provider:
     authorizers:
       adminJwtAuthorizer:
         identitySource: $request.header.Authorization
-        issuerUrl: https://cognito-idp.ap-northeast-1.amazonaws.com/${env:TARGET_USER_POOL_ID}
+        issuerUrl: https://cognito-idp.${env:REGION}.amazonaws.com/${env:TARGET_USER_POOL_ID}
         audience:
           - ${env:NEXT_IDAAS_SERVER_CLIENT_ID}
 
