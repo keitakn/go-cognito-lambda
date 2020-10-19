@@ -14,6 +14,7 @@ export DEPLOY_STAGE=デプロイターゲット（.eg. dev, stg, prod）
 export TARGET_USER_POOL_ID=ターゲットとなるUserPoolのID
 export TRIGGER_USER_POOL_NAME=ターゲットとなるUserPoolの名前
 export REGION=AWSのリージョン（.eg. ap-northeast-1）
+export NEXT_IDAAS_SERVER_CLIENT_ID=クライアントシークレットを安全に保管出来るサーバーサイドアプリケーション用のUserPoolClientIDを指定
 ```
 
 ## AWSクレデンシャルの設定
