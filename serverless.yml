@@ -19,9 +19,17 @@ provider:
         - logs:CreateLogStream
         - logs:PutLogEvents
       Resource: "*"
+    - Effect: Allow
+      Action:
+        - cognito-identity:*
+        - cognito-idp:*
+        - cognito-sync:*
+      Resource:
+        - "arn:aws:cognito-idp:*"
   environment:
     DEPLOY_STAGE: ${env:DEPLOY_STAGE}
     TARGET_USER_POOL_ID: ${env:TARGET_USER_POOL_ID}
+    REGION: ${env:REGION}
   httpApi:
     cors: true
     authorizers:
