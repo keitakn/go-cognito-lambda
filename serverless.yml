@@ -70,4 +70,4 @@ functions:
           authorizer:
             name: adminJwtAuthorizer
             scopes:
-              - ${env:DEPLOY_STAGE}-cognito-admin-api/admin
+              - ${env:DEPLOY_STAGE}-cognito-admin-api.keitakn.de/admin
