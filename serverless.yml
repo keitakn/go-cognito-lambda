@@ -62,7 +62,7 @@ functions:
           trigger: CustomMessage
           existing: true
   changePassword:
-    handler: bin/change-password
+    handler: bin/changepassword
     events:
       - httpApi:
           method: PATCH
