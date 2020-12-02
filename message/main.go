@@ -24,7 +24,7 @@ func init() {
 	templates = template.Must(template.ParseFiles(signupTemplatePath, forgotPasswordTemplatePath))
 }
 
-type SignupMessage struct {
+type SignUpMessage struct {
 	ConfirmUrl string
 }
 
@@ -32,10 +32,10 @@ type ForgotPasswordMessage struct {
 	ConfirmUrl string
 }
 
-func BuildSignupMessage(sm SignupMessage) (*bytes.Buffer, error) {
+func BuildSignupMessage(m SignUpMessage) (*bytes.Buffer, error) {
 	var bodyBuffer bytes.Buffer
 
-	err := templates.ExecuteTemplate(&bodyBuffer, "signup-template.html", sm)
+	err := templates.ExecuteTemplate(&bodyBuffer, "signup-template.html", m)
 	if err != nil {
 		return nil, err
 	}
@@ -43,10 +43,10 @@ func BuildSignupMessage(sm SignupMessage) (*bytes.Buffer, error) {
 	return &bodyBuffer, nil
 }
 
-func BuildForgotPasswordMessage(fm ForgotPasswordMessage) (*bytes.Buffer, error) {
+func BuildForgotPasswordMessage(m ForgotPasswordMessage) (*bytes.Buffer, error) {
 	var bodyBuffer bytes.Buffer
 
-	err := templates.ExecuteTemplate(&bodyBuffer, "forgot-password-template.html", fm)
+	err := templates.ExecuteTemplate(&bodyBuffer, "forgot-password-template.html", m)
 	if err != nil {
 		return nil, err
 	}
@@ -64,11 +64,11 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 
 	// サインアップ時に送られる認証メール
 	if request.TriggerSource == "CustomMessage_SignUp" || request.TriggerSource == "CustomMessage_ResendCode" {
-		sm := SignupMessage{
+		m := SignUpMessage{
 			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
 		}
 
-		body, err := BuildSignupMessage(sm)
+		body, err := BuildSignupMessage(m)
 		if err != nil {
 			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
 			log.Fatalln(err)
@@ -84,11 +84,11 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 	}
 
 	if request.TriggerSource == "CustomMessage_ForgotPassword" {
-		fm := ForgotPasswordMessage{
+		m := ForgotPasswordMessage{
 			ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
 		}
 
-		body, err := BuildForgotPasswordMessage(fm)
+		body, err := BuildForgotPasswordMessage(m)
 		if err != nil {
 			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
 			log.Fatalln(err)

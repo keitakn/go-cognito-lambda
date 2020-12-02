@@ -30,21 +30,20 @@ func init() {
 
 func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
 	var reqBody RequestBody
-	errJSONUnmarshal := json.Unmarshal([]byte(req.Body), &reqBody)
-	if errJSONUnmarshal != nil {
+	if err := json.Unmarshal([]byte(req.Body), &reqBody); err != nil {
 		resBody := &ResponseBody{Message: "Bad Request"}
-		resBodyJSON, _ := json.Marshal(resBody)
+		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
 			StatusCode: 400,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
-			Body:            string(resBodyJSON),
+			Body:            string(resBodyJson),
 			IsBase64Encoded: false,
 		}
 
-		return res, errJSONUnmarshal
+		return res, err
 	}
 
 	param := &cognitoidentityprovider.AdminSetUserPasswordInput{
@@ -54,32 +53,31 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		Permanent:  aws.Bool(true),
 	}
 
-	_, errAdminSetUserPassword := svc.AdminSetUserPassword(param)
-	if errAdminSetUserPassword != nil {
+	if _, err := svc.AdminSetUserPassword(param); err != nil {
 		resBody := &ResponseBody{Message: "failed to password update."}
-		resBodyJSON, _ := json.Marshal(resBody)
+		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
 			StatusCode: 500,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
-			Body:            string(resBodyJSON),
+			Body:            string(resBodyJson),
 			IsBase64Encoded: false,
 		}
 
-		return res, errAdminSetUserPassword
+		return res, err
 	}
 
 	resBody := &ResponseBody{Message: "API Gateway v2 PATCH /users/passwords"}
-	resBodyJSON, _ := json.Marshal(resBody)
+	resBodyJson, _ := json.Marshal(resBody)
 
 	res := events.APIGatewayV2HTTPResponse{
 		StatusCode: 200,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
-		Body:            string(resBodyJSON),
+		Body:            string(resBodyJson),
 		IsBase64Encoded: false,
 	}
 

@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"html/template"
 	"os"
 	"reflect"
 	"testing"
@@ -10,94 +8,26 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
-// SignUpカスタムメッセージのテスト用期待値を作成する
-func createExpectedSignUpMessage(sm SignupMessage) (*bytes.Buffer, error) {
-	t := template.New("signup-template.html")
-
-	currentDir, _ := os.Getwd()
-	templatePath := currentDir + "/signup-template.html"
-
-	templates := template.Must(t.ParseFiles(templatePath))
-
-	var bodyBuffer bytes.Buffer
-	err := templates.Execute(&bodyBuffer, sm)
-	if err != nil {
-		return nil, err
-	}
-
-	return &bodyBuffer, nil
-}
-
-// ForgotPasswordMessageカスタムメッセージのテスト用期待値を作成する
-func createExpectedForgotPasswordMessageMessage(fm ForgotPasswordMessage) (*bytes.Buffer, error) {
-	t := template.New("forgot-password-template.html")
-
-	currentDir, _ := os.Getwd()
-	templatePath := currentDir + "/forgot-password-template.html"
-
-	templates := template.Must(t.ParseFiles(templatePath))
-
-	var bodyBuffer bytes.Buffer
-	err := templates.Execute(&bodyBuffer, fm)
-	if err != nil {
-		return nil, err
-	}
-
-	return &bodyBuffer, nil
-}
-
 func TestHandler(t *testing.T) {
 	// TriggerSourceが 'CustomMessage_SignUp' の場合はCustomMessageが返却される
 	t.Run("Return Signup CustomMessage", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_SignUp",
-			Region:        "",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
-			CallerContext: *cc,
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		sm := SignupMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+		m := SignUpMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
 
-		body, err := createExpectedSignUpMessage(sm)
+		body, err := createExpectedSignUpMessage(m)
 		if err != nil {
 			t.Fatal("Error Failed to parse HTML Template", err)
 		}
@@ -115,55 +45,23 @@ func TestHandler(t *testing.T) {
 
 	// TriggerSourceが 'CustomMessage_ResendCode' の場合はCustomMessageが返却される
 	t.Run("Return ResendCode CustomMessage", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ResendCode",
-			Region:        "",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
-			CallerContext: *cc,
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		sm := SignupMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+		m := SignUpMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
 
-		body, err := createExpectedSignUpMessage(sm)
+		body, err := createExpectedSignUpMessage(m)
 		if err != nil {
 			t.Fatal("Error Failed to parse HTML Template", err)
 		}
@@ -181,55 +79,23 @@ func TestHandler(t *testing.T) {
 
 	// TriggerSourceが 'CustomMessage_ForgotPassword' の場合はCustomMessageが返却される
 	t.Run("Return ForgotPassword CustomMessage", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ForgotPassword",
-			Region:        "",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
-			CallerContext: *cc,
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		fm := ForgotPasswordMessage{ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=123456789&sub=keitakn"}
+		m := ForgotPasswordMessage{ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=123456789&sub=keitakn"}
 
-		body, err := createExpectedForgotPasswordMessageMessage(fm)
+		body, err := createExpectedForgotPasswordMessageMessage(m)
 		if err != nil {
 			t.Fatal("Error Failed to parse HTML Template", err)
 		}
@@ -246,49 +112,17 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_SignUp' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return Signup DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+	t.Run("Return Signup DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_SignUp",
-			Region:        "",
-			UserPoolID:    "OtherUserPoolID",
-			CallerContext: *cc,
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
@@ -305,49 +139,17 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_ResendCode' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return ResendCode DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+	t.Run("Return ResendCode DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ResendCode",
-			Region:        "",
-			UserPoolID:    "OtherUserPoolID",
-			CallerContext: *cc,
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
@@ -364,49 +166,17 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_ForgotPassword' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return ForgotPassword DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+	t.Run("Return ForgotPassword DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ForgotPassword",
-			Region:        "",
-			UserPoolID:    "OtherUserPoolID",
-			CallerContext: *cc,
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
@@ -424,48 +194,16 @@ func TestHandler(t *testing.T) {
 
 	// TriggerSourceが指定した値以外の場合はDefaultのメッセージが返却される
 	t.Run("Return DefaultMessage Because the TriggerSource is not a specified value", func(t *testing.T) {
-		cc := &events.CognitoEventUserPoolsCallerContext{
-			AWSSDKVersion: "",
-			ClientID:      "",
-		}
-
-		ch := &events.CognitoEventUserPoolsHeader{
-			Version:       "",
+		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "Unknown",
-			Region:        "",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
-			CallerContext: *cc,
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
+			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
+			CodeParameter: "123456789",
 		}
 
-		ua := map[string]interface{}{
-			"sub": "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
-		}
-
-		cm := map[string]string{
-			"key": "",
-		}
-
-		req := &events.CognitoEventUserPoolsCustomMessageRequest{
-			UserAttributes:    ua,
-			CodeParameter:     "123456789",
-			UsernameParameter: "keitakn",
-			ClientMetadata:    cm,
-		}
-
-		res := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "SMSMessage",
-			EmailMessage: "EmailMessage",
-			EmailSubject: "EmailSubject",
-		}
-
-		ev := &events.CognitoEventUserPoolsCustomMessage{
-			CognitoEventUserPoolsHeader: *ch,
-			Request:                     *req,
-			Response:                    *res,
-		}
-
-		handlerResult, err := handler(*ev)
+		event := createUserPoolsCustomMessageEvent(createEventParams)
+		handlerResult, err := handler(*event)
 		if err != nil {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
