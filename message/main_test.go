@@ -13,7 +13,7 @@ func TestHandler(t *testing.T) {
 	t.Run("Return Signup CustomMessage", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_SignUp",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -47,7 +47,7 @@ func TestHandler(t *testing.T) {
 	t.Run("Return ResendCode CustomMessage", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ResendCode",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -81,7 +81,7 @@ func TestHandler(t *testing.T) {
 	t.Run("Return ForgotPassword CustomMessage", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ForgotPassword",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -112,10 +112,10 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_SignUp' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return Signup DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
+	t.Run("Return Signup DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_SignUp",
-			UserPoolID:    "OtherUserPoolID",
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -139,10 +139,10 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_ResendCode' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return ResendCode DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
+	t.Run("Return ResendCode DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ResendCode",
-			UserPoolID:    "OtherUserPoolID",
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -166,10 +166,10 @@ func TestHandler(t *testing.T) {
 	})
 
 	// TriggerSourceが 'CustomMessage_ForgotPassword' だがUserPoolIDが一致しないのでDefaultのメッセージが返却される
-	t.Run("Return ForgotPassword DefaultMessage Because the UserPoolID doesn't match", func(t *testing.T) {
+	t.Run("Return ForgotPassword DefaultMessage Because the UserPoolId doesn't match", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ForgotPassword",
-			UserPoolID:    "OtherUserPoolID",
+			UserPoolId:    "OtherUserPoolID",
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",
@@ -196,7 +196,7 @@ func TestHandler(t *testing.T) {
 	t.Run("Return DefaultMessage Because the TriggerSource is not a specified value", func(t *testing.T) {
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "Unknown",
-			UserPoolID:    os.Getenv("TARGET_USER_POOL_ID"),
+			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
 			UserName:      "keitakn",
 			Sub:           "dba1d5db-1d94-45b6-8f1b-fad23bb94cd5",
 			CodeParameter: "123456789",

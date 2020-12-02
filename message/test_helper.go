@@ -45,7 +45,7 @@ func createExpectedForgotPasswordMessageMessage(m ForgotPasswordMessage) (*bytes
 
 type createUserPoolsCustomMessageEventParams struct {
 	TriggerSource string
-	UserPoolID    string
+	UserPoolId    string
 	UserName      string
 	Sub           string
 	CodeParameter string
@@ -61,7 +61,7 @@ func createUserPoolsCustomMessageEvent(p *createUserPoolsCustomMessageEventParam
 		Version:       "",
 		TriggerSource: p.TriggerSource,
 		Region:        "",
-		UserPoolID:    p.UserPoolID,
+		UserPoolID:    p.UserPoolId,
 		CallerContext: *cc,
 		UserName:      p.UserName,
 	}
