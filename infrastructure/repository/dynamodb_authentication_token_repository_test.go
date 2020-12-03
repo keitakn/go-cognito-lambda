@@ -5,7 +5,6 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/google/uuid"
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
@@ -45,35 +44,29 @@ func TestMain(m *testing.M) {
 
 func TestHandler(t *testing.T) {
 	t.Run("Successful Create AuthenticationToken", func(t *testing.T) {
-		now := time.Now()
+		tokensCreator := domain.AuthenticationTokensCreator{
+			CognitoSub:    "0ef53af5-4eb9-4d2b-a939-8cb9d795512b",
+			SubscribeNews: true,
+			Time:          time.Now(),
+		}
 
-		expirationTime := now.Add(10 * time.Minute)
+		tokens, err := tokensCreator.Create()
+		if err != nil {
+			t.Fatal("Error failed to Generate AuthenticationTokens", err)
+		}
 
 		repo := DynamodbAuthenticationTokenRepository{Dynamodb: db}
-
-		token, err := uuid.NewRandom()
-		if err != nil {
-			t.Fatal("Error failed to Generate UUID", err)
-		}
-
-		putItem := domain.AuthenticationTokens{
-			Token:          token.String(),
-			CognitoSub:     "0ef53af5-4eb9-4d2b-a939-8cb9d795512b",
-			SubscribeNews:  true,
-			ExpirationTime: expirationTime.Unix(),
-		}
-
-		if err := repo.Create(putItem); err != nil {
+		if err := repo.Create(*tokens); err != nil {
 			t.Fatal("Error failed to AuthenticationTokenRepository Create", err)
 		}
 
-		authenticationTokens, err := repo.FindByToken(token.String())
+		authenticationTokens, err := repo.FindByToken(tokens.Token)
 		if err != nil {
 			t.Fatal("Error failed to AuthenticationTokenRepository FindByToken", err)
 		}
 
-		if reflect.DeepEqual(authenticationTokens, &putItem) == false {
-			t.Error("\nActually: ", authenticationTokens, "\nExpected: ", putItem)
+		if reflect.DeepEqual(authenticationTokens, tokens) == false {
+			t.Error("\nActually: ", authenticationTokens, "\nExpected: ", tokens)
 		}
 	})
 }
