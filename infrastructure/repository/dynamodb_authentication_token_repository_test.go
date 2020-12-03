@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/keitakn/go-cognito-lambda/domain"
+	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
 	"os"
 	"reflect"
@@ -25,57 +26,15 @@ func TestMain(m *testing.M) {
 		Credentials: credentials.NewStaticCredentials("dummy", "dummy", "dummy"),
 	})
 
-	createTableInput := &dynamodb.CreateTableInput{
-		AttributeDefinitions: []*dynamodb.AttributeDefinition{
-			{
-				AttributeName: aws.String("Token"),
-				AttributeType: aws.String("S"),
-			},
-			{
-				AttributeName: aws.String("CognitoSub"),
-				AttributeType: aws.String("S"),
-			},
-		},
-		KeySchema: []*dynamodb.KeySchemaElement{
-			{
-				AttributeName: aws.String("Token"),
-				KeyType:       aws.String("HASH"),
-			},
-		},
-		GlobalSecondaryIndexes: []*dynamodb.GlobalSecondaryIndex{
-			{
-				IndexName: aws.String("AuthenticationTokensGlobalIndexCognitoSub"),
-				KeySchema: []*dynamodb.KeySchemaElement{
-					{
-						AttributeName: aws.String("CognitoSub"),
-						KeyType:       aws.String("HASH"),
-					},
-				},
-				Projection: &dynamodb.Projection{
-					ProjectionType: aws.String("ALL"),
-				},
-				ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-					ReadCapacityUnits:  aws.Int64(1),
-					WriteCapacityUnits: aws.Int64(1),
-				},
-			},
-		},
-		ProvisionedThroughput: &dynamodb.ProvisionedThroughput{
-			ReadCapacityUnits:  aws.Int64(1),
-			WriteCapacityUnits: aws.Int64(1),
-		},
-		TableName: aws.String("AuthenticationTokens"),
-	}
+	dynamodbHelper := test.DynamodbHelper{Dynamodb: db}
 
-	if _, err := db.CreateTable(createTableInput); err != nil {
+	if err := dynamodbHelper.CreateTestAuthenticationTokensTable(); err != nil {
 		log.Fatal(err)
 	}
 
 	status := m.Run()
 
-	deleteTableInput := &dynamodb.DeleteTableInput{TableName: aws.String("AuthenticationTokens")}
-
-	if _, err := db.DeleteTable(deleteTableInput); err != nil {
+	if err := dynamodbHelper.CreateTestAuthenticationTokensTable(); err != nil {
 		log.Fatal(err)
 	}
 
