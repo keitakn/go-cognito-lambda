@@ -12,6 +12,7 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"time"
 )
 
 var db *dynamodb.DynamoDB
@@ -44,6 +45,10 @@ func TestMain(m *testing.M) {
 
 func TestHandler(t *testing.T) {
 	t.Run("Successful Create AuthenticationToken", func(t *testing.T) {
+		now := time.Now()
+
+		expirationTime := now.Add(10 * time.Minute)
+
 		repo := DynamodbAuthenticationTokenRepository{Dynamodb: db}
 
 		token, err := uuid.NewRandom()
@@ -55,7 +60,7 @@ func TestHandler(t *testing.T) {
 			Token:          token.String(),
 			CognitoSub:     "0ef53af5-4eb9-4d2b-a939-8cb9d795512b",
 			SubscribeNews:  true,
-			ExpirationTime: 1922395084,
+			ExpirationTime: expirationTime.Unix(),
 		}
 
 		if err := repo.Create(putItem); err != nil {
