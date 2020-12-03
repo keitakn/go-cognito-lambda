@@ -7,11 +7,11 @@ import (
 	"github.com/keitakn/go-cognito-lambda/domain"
 )
 
-type DynamoDbAuthenticationTokenRepository struct {
+type DynamodbAuthenticationTokenRepository struct {
 	db *dynamodb.DynamoDB
 }
 
-func (r *DynamoDbAuthenticationTokenRepository) Create(item domain.AuthenticationTokens) error {
+func (r *DynamodbAuthenticationTokenRepository) Create(item domain.AuthenticationTokens) error {
 	av, err := dynamodbattribute.MarshalMap(item)
 	if err != nil {
 		return err
@@ -30,7 +30,7 @@ func (r *DynamoDbAuthenticationTokenRepository) Create(item domain.Authenticatio
 	return nil
 }
 
-func (r *DynamoDbAuthenticationTokenRepository) FindByToken(token string) (*domain.AuthenticationTokens, error) {
+func (r *DynamodbAuthenticationTokenRepository) FindByToken(token string) (*domain.AuthenticationTokens, error) {
 	input := &dynamodb.GetItemInput{
 		TableName: aws.String("AuthenticationTokens"),
 		Key: map[string]*dynamodb.AttributeValue{

@@ -84,7 +84,7 @@ func TestMain(m *testing.M) {
 
 func TestHandler(t *testing.T) {
 	t.Run("Successful Create AuthenticationToken", func(t *testing.T) {
-		repo := DynamoDbAuthenticationTokenRepository{db: db}
+		repo := DynamodbAuthenticationTokenRepository{db: db}
 
 		token := "TestToken"
 
