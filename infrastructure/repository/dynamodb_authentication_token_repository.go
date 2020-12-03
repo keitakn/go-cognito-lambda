@@ -8,7 +8,7 @@ import (
 )
 
 type DynamodbAuthenticationTokenRepository struct {
-	db *dynamodb.DynamoDB
+	Dynamodb *dynamodb.DynamoDB
 }
 
 func (r *DynamodbAuthenticationTokenRepository) Create(item domain.AuthenticationTokens) error {
@@ -22,7 +22,7 @@ func (r *DynamodbAuthenticationTokenRepository) Create(item domain.Authenticatio
 		Item:      av,
 	}
 
-	_, err = r.db.PutItem(input)
+	_, err = r.Dynamodb.PutItem(input)
 	if err != nil {
 		return err
 	}
@@ -40,7 +40,7 @@ func (r *DynamodbAuthenticationTokenRepository) FindByToken(token string) (*doma
 		},
 	}
 
-	result, err := r.db.GetItem(input)
+	result, err := r.Dynamodb.GetItem(input)
 	if err != nil {
 		return nil, err
 	}
