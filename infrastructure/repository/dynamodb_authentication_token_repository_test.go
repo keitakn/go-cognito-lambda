@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/google/uuid"
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
@@ -34,7 +35,7 @@ func TestMain(m *testing.M) {
 
 	status := m.Run()
 
-	if err := dynamodbHelper.CreateTestAuthenticationTokensTable(); err != nil {
+	if err := dynamodbHelper.DeleteTestAuthenticationTokensTable(); err != nil {
 		log.Fatal(err)
 	}
 
@@ -45,21 +46,23 @@ func TestHandler(t *testing.T) {
 	t.Run("Successful Create AuthenticationToken", func(t *testing.T) {
 		repo := DynamodbAuthenticationTokenRepository{Dynamodb: db}
 
-		token := "TestToken"
+		token, err := uuid.NewRandom()
+		if err != nil {
+			t.Fatal("Error failed to Generate UUID", err)
+		}
 
 		putItem := domain.AuthenticationTokens{
-			Token:          token,
+			Token:          token.String(),
 			CognitoSub:     "0ef53af5-4eb9-4d2b-a939-8cb9d795512b",
 			SubscribeNews:  true,
 			ExpirationTime: 1922395084,
 		}
 
-		err := repo.Create(putItem)
-		if err != nil {
+		if err := repo.Create(putItem); err != nil {
 			t.Fatal("Error failed to AuthenticationTokenRepository Create", err)
 		}
 
-		authenticationTokens, err := repo.FindByToken(token)
+		authenticationTokens, err := repo.FindByToken(token.String())
 		if err != nil {
 			t.Fatal("Error failed to AuthenticationTokenRepository FindByToken", err)
 		}
