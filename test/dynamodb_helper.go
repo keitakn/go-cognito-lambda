@@ -3,6 +3,8 @@ package test
 import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"os"
+	"strings"
 )
 
 type DynamodbHelper struct {
@@ -49,7 +51,7 @@ func (h *DynamodbHelper) CreateTestAuthenticationTokensTable() error {
 			ReadCapacityUnits:  aws.Int64(1),
 			WriteCapacityUnits: aws.Int64(1),
 		},
-		TableName: aws.String("AuthenticationTokens"),
+		TableName: aws.String(strings.Title(os.Getenv("DEPLOY_STAGE")) + "AuthenticationTokens"),
 	}
 
 	if _, err := h.Dynamodb.CreateTable(createTableInput); err != nil {
