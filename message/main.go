@@ -79,9 +79,17 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 
 	// サインアップ時に送られる認証メール
 	if request.TriggerSource == "CustomMessage_SignUp" || request.TriggerSource == "CustomMessage_ResendCode" {
+		subscribeNews := false
+		if sendSubscribeNews, ok := request.Request.ClientMetadata["subscribeNews"]; ok {
+			if sendSubscribeNews == "1" {
+				subscribeNews = true
+			}
+		}
+
 		authenticationTokensCreator := domain.AuthenticationTokensCreator{
-			CognitoSub: request.UserName,
-			Time:       time.Now(),
+			CognitoSub:    request.UserName,
+			SubscribeNews: subscribeNews,
+			Time:          time.Now(),
 		}
 
 		authenticationTokens, err := authenticationTokensCreator.Create()
