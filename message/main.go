@@ -30,11 +30,11 @@ func init() {
 		forgotPasswordTemplatePath = currentDir + "/forgot-password-template.html"
 
 		db = dynamodbClientCreator.CreateTestClient()
+	} else {
+		db = dynamodbClientCreator.Create()
 	}
 
 	templates = template.Must(template.ParseFiles(signupTemplatePath, forgotPasswordTemplatePath))
-
-	db = dynamodbClientCreator.Create()
 
 	authenticationTokenRepository = &repository.DynamodbAuthenticationTokenRepository{Dynamodb: db}
 }
