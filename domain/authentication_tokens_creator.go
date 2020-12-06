@@ -1,0 +1,35 @@
+package domain
+
+import (
+	"github.com/google/uuid"
+	"time"
+)
+
+type AuthenticationTokensCreator struct {
+	Token         string
+	CognitoSub    string
+	SubscribeNews bool
+	Time          time.Time
+}
+
+func (c *AuthenticationTokensCreator) Create() (*AuthenticationTokens, error) {
+	token := c.Token
+
+	if token == "" {
+		randomToken, err := uuid.NewRandom()
+		if err != nil {
+			return nil, err
+		}
+
+		token = randomToken.String()
+	}
+
+	expirationTime := c.Time.Add(10 * time.Minute)
+
+	return &AuthenticationTokens{
+		Token:          token,
+		CognitoSub:     c.CognitoSub,
+		SubscribeNews:  c.SubscribeNews,
+		ExpirationTime: expirationTime.Unix(),
+	}, nil
+}

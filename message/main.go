@@ -4,24 +4,39 @@ import (
 	"bytes"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/infrastructure"
+	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
 	"html/template"
 	"log"
 	"os"
+	"time"
 )
 
 var templates *template.Template
+var db *dynamodb.DynamoDB
+var authenticationTokenRepository domain.AuthenticationTokenRepository
 
 func init() {
 	signupTemplatePath := "bin/signup-template.html"
 	forgotPasswordTemplatePath := "bin/forgot-password-template.html"
+
+	dynamodbClientCreator := infrastructure.DynamodbClientCreator{}
+
 	if infrastructure.IsTestRun() {
 		currentDir, _ := os.Getwd()
 		signupTemplatePath = currentDir + "/signup-template.html"
 		forgotPasswordTemplatePath = currentDir + "/forgot-password-template.html"
+
+		db = dynamodbClientCreator.CreateTestClient()
+	} else {
+		db = dynamodbClientCreator.Create()
 	}
 
 	templates = template.Must(template.ParseFiles(signupTemplatePath, forgotPasswordTemplatePath))
+
+	authenticationTokenRepository = &repository.DynamodbAuthenticationTokenRepository{Dynamodb: db}
 }
 
 type SignUpMessage struct {
@@ -64,8 +79,33 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 
 	// サインアップ時に送られる認証メール
 	if request.TriggerSource == "CustomMessage_SignUp" || request.TriggerSource == "CustomMessage_ResendCode" {
+		subscribeNews := false
+		if sendSubscribeNews, ok := request.Request.ClientMetadata["subscribeNews"]; ok {
+			if sendSubscribeNews == "1" {
+				subscribeNews = true
+			}
+		}
+
+		authenticationTokensCreator := domain.AuthenticationTokensCreator{
+			CognitoSub:    request.UserName,
+			SubscribeNews: subscribeNews,
+			Time:          time.Now(),
+		}
+
+		authenticationTokens, err := authenticationTokensCreator.Create()
+		if err != nil {
+			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+			log.Fatalln(err)
+		}
+
+		err = authenticationTokenRepository.Create(*authenticationTokens)
+		if err != nil {
+			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+			log.Fatalln(err)
+		}
+
 		m := SignUpMessage{
-			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
+			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName + "&authenticationToken=" + authenticationTokens.Token,
 		}
 
 		body, err := BuildSignupMessage(m)

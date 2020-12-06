@@ -18,6 +18,13 @@ provider:
         - logs:CreateLogGroup
         - logs:CreateLogStream
         - logs:PutLogEvents
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
       Resource: "*"
     - Effect: Allow
       Action:
@@ -71,3 +78,15 @@ functions:
             name: adminJwtAuthorizer
             scopes:
               - ${env:DEPLOY_STAGE}-cognito-admin-api.keitakn.de/admin
+
+resources:
+  Resources:
+    OnCognitoCustomMessageInvokeLambdaPermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        Action: "lambda:InvokeFunction"
+        FunctionName:
+          Fn::GetAtt: [ "CustomMessageLambdaFunction", "Arn"]
+        Principal: "cognito-idp.amazonaws.com"
+        SourceArn:
+          Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
