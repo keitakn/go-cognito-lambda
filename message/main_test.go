@@ -1,6 +1,9 @@
 package main
 
 import (
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+	"github.com/keitakn/go-cognito-lambda/test"
+	"log"
 	"os"
 	"reflect"
 	"testing"
@@ -8,12 +11,29 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+func TestMain(m *testing.M) {
+	dynamodbClientCreator := infrastructure.DynamodbClientCreator{}
+
+	dynamodb := dynamodbClientCreator.CreateTestClient()
+
+	dynamodbHelper := test.DynamodbHelper{Dynamodb: dynamodb}
+
+	if err := dynamodbHelper.CreateTestAuthenticationTokensTable(); err != nil {
+		log.Fatal(err)
+	}
+
+	status := m.Run()
+
+	if err := dynamodbHelper.DeleteTestAuthenticationTokensTable(); err != nil {
+		log.Fatal(err)
+	}
+
+	os.Exit(status)
+}
+
 func TestHandler(t *testing.T) {
 	// TriggerSourceが 'CustomMessage_SignUp' の場合はCustomMessageが返却される
 	t.Run("Return Signup CustomMessage", func(t *testing.T) {
-		// TODO 別課題でテストを書けるようにリファクタリングする
-		t.Skip("DynamoDBの部分をMock化しないとテストが通らないので一旦スキップ")
-
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_SignUp",
 			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
@@ -28,29 +48,15 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		m := SignUpMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+		expected := "サインアップ メールアドレスの確認をお願いします。"
 
-		body, err := createExpectedSignUpMessage(m)
-		if err != nil {
-			t.Fatal("Error Failed to parse HTML Template", err)
-		}
-
-		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: body.String(),
-			EmailSubject: "サインアップ メールアドレスの確認をお願いします。",
-		}
-
-		if reflect.DeepEqual(&handlerResult.Response, expected) == false {
-			t.Error("\nActually: ", &handlerResult.Response, "\nExpected: ", expected)
+		if reflect.DeepEqual(handlerResult.Response.EmailSubject, expected) == false {
+			t.Error("\nActually: ", handlerResult.Response.EmailSubject, "\nExpected: ", expected)
 		}
 	})
 
 	// TriggerSourceが 'CustomMessage_ResendCode' の場合はCustomMessageが返却される
 	t.Run("Return ResendCode CustomMessage", func(t *testing.T) {
-		// TODO 別課題でテストを書けるようにリファクタリングする
-		t.Skip("DynamoDBの部分をMock化しないとテストが通らないので一旦スキップ")
-
 		createEventParams := &createUserPoolsCustomMessageEventParams{
 			TriggerSource: "CustomMessage_ResendCode",
 			UserPoolId:    os.Getenv("TARGET_USER_POOL_ID"),
@@ -65,21 +71,10 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		m := SignUpMessage{ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=123456789&sub=keitakn"}
+		expected := "サインアップ メールアドレスの確認をお願いします。"
 
-		body, err := createExpectedSignUpMessage(m)
-		if err != nil {
-			t.Fatal("Error Failed to parse HTML Template", err)
-		}
-
-		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: body.String(),
-			EmailSubject: "サインアップ メールアドレスの確認をお願いします。",
-		}
-
-		if reflect.DeepEqual(&handlerResult.Response, expected) == false {
-			t.Error("\nActually: ", &handlerResult.Response, "\nExpected: ", expected)
+		if reflect.DeepEqual(handlerResult.Response.EmailSubject, expected) == false {
+			t.Error("\nActually: ", handlerResult.Response.EmailSubject, "\nExpected: ", expected)
 		}
 	})
 
@@ -99,21 +94,10 @@ func TestHandler(t *testing.T) {
 			t.Fatal("Error failed to trigger with an invalid request", err)
 		}
 
-		m := ForgotPasswordMessage{ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=123456789&sub=keitakn"}
+		expected := "パスワードをリセットします。"
 
-		body, err := createExpectedForgotPasswordMessageMessage(m)
-		if err != nil {
-			t.Fatal("Error Failed to parse HTML Template", err)
-		}
-
-		expected := &events.CognitoEventUserPoolsCustomMessageResponse{
-			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: body.String(),
-			EmailSubject: "パスワードをリセットします。",
-		}
-
-		if reflect.DeepEqual(&handlerResult.Response, expected) == false {
-			t.Error("\nActually: ", &handlerResult.Response, "\nExpected: ", expected)
+		if reflect.DeepEqual(handlerResult.Response.EmailSubject, expected) == false {
+			t.Error("\nActually: ", handlerResult.Response.EmailSubject, "\nExpected: ", expected)
 		}
 	})
 
