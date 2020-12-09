@@ -5,6 +5,7 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/keitakn/go-cognito-lambda/application"
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/infrastructure"
 	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
@@ -92,23 +93,14 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 			Time:          time.Now(),
 		}
 
-		authenticationTokens, err := authenticationTokensCreator.Create()
-		if err != nil {
-			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
-			log.Fatalln(err)
+		scenario := application.CustomMessageScenario{
+			Templates:                     templates,
+			AuthenticationTokenRepository: authenticationTokenRepository,
+			AuthenticationTokensCreator:   authenticationTokensCreator,
 		}
 
-		err = authenticationTokenRepository.Create(*authenticationTokens)
-		if err != nil {
-			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
-			log.Fatalln(err)
-		}
-
-		m := SignUpMessage{
-			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName + "&authenticationToken=" + authenticationTokens.Token,
-		}
-
-		body, err := BuildSignupMessage(m)
+		p := application.SignUpMessageBuildParams{Code: request.Request.CodeParameter, SubscribeNews: subscribeNews}
+		body, err := scenario.BuildSignupMessage(p)
 		if err != nil {
 			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
 			log.Fatalln(err)
@@ -116,7 +108,7 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 
 		signupMessageResponse := events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: body.String(),
+			EmailMessage: body,
 			EmailSubject: "サインアップ メールアドレスの確認をお願いします。",
 		}
 
@@ -124,11 +116,19 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 	}
 
 	if request.TriggerSource == "CustomMessage_ForgotPassword" {
-		m := ForgotPasswordMessage{
-			ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=" + request.Request.CodeParameter + "&sub=" + request.UserName,
+		authenticationTokensCreator := domain.AuthenticationTokensCreator{
+			CognitoSub: request.UserName,
+			Time:       time.Now(),
 		}
 
-		body, err := BuildForgotPasswordMessage(m)
+		scenario := application.CustomMessageScenario{
+			Templates:                     templates,
+			AuthenticationTokenRepository: authenticationTokenRepository,
+			AuthenticationTokensCreator:   authenticationTokensCreator,
+		}
+
+		p := application.ForgotPasswordMessageBuildParams{Code: request.Request.CodeParameter}
+		body, err := scenario.BuildForgotPasswordMessage(p)
 		if err != nil {
 			// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
 			log.Fatalln(err)
@@ -136,7 +136,7 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 
 		forgotPasswordMessageResponse := events.CognitoEventUserPoolsCustomMessageResponse{
 			SMSMessage:   "認証コードは {####} です。",
-			EmailMessage: body.String(),
+			EmailMessage: body,
 			EmailSubject: "パスワードをリセットします。",
 		}
 
