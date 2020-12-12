@@ -68,6 +68,27 @@ functions:
           pool: ${env:TRIGGER_USER_POOL_NAME}
           trigger: CustomMessage
           existing: true
+  defineAuthChallenge:
+    handler: bin/defineauthchallenge
+    events:
+      - cognitoUserPool:
+          pool: ${env:TRIGGER_USER_POOL_NAME}
+          trigger: DefineAuthChallenge
+          existing: true
+  createAuthChallenge:
+    handler: bin/createauthchallenge
+    events:
+      - cognitoUserPool:
+          pool: ${env:TRIGGER_USER_POOL_NAME}
+          trigger: CreateAuthChallenge
+          existing: true
+  verifyAuthChallenge:
+    handler: bin/verifyauthchallenge
+    events:
+      - cognitoUserPool:
+          pool: ${env:TRIGGER_USER_POOL_NAME}
+          trigger: VerifyAuthChallengeResponse
+          existing: true
   changePassword:
     handler: bin/changepassword
     events:
@@ -87,6 +108,33 @@ resources:
         Action: "lambda:InvokeFunction"
         FunctionName:
           Fn::GetAtt: [ "CustomMessageLambdaFunction", "Arn"]
+        Principal: "cognito-idp.amazonaws.com"
+        SourceArn:
+          Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
+    OnCognitoDefineAuthChallengeInvokeLambdaPermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        Action: "lambda:InvokeFunction"
+        FunctionName:
+          Fn::GetAtt: [ "DefineAuthChallengeLambdaFunction", "Arn"]
+        Principal: "cognito-idp.amazonaws.com"
+        SourceArn:
+          Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
+    OnCognitoCreateAuthChallengeInvokeLambdaPermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        Action: "lambda:InvokeFunction"
+        FunctionName:
+          Fn::GetAtt: [ "CreateAuthChallengeLambdaFunction", "Arn"]
+        Principal: "cognito-idp.amazonaws.com"
+        SourceArn:
+          Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
+    OnCognitoVerifyAuthChallengeInvokeLambdaPermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        Action: "lambda:InvokeFunction"
+        FunctionName:
+          Fn::GetAtt: [ "VerifyAuthChallengeLambdaFunction", "Arn"]
         Principal: "cognito-idp.amazonaws.com"
         SourceArn:
           Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]

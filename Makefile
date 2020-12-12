@@ -7,6 +7,9 @@ build:
 	cp message/forgot-password-template.html bin/forgot-password-template.html
 	GOOS=linux GOARCH=amd64 go build -o bin/changepassword ./api/changepassword/main.go
 	chmod +x bin/changepassword
+	GOOS=linux GOARCH=amd64 go build -o bin/defineauthchallenge ./authchallenge/define/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/createauthchallenge ./authchallenge/create/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/verifyauthchallenge ./authchallenge/verify/main.go
 
 clean:
 	rm -rf ./bin

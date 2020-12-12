@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bytes"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -38,36 +37,6 @@ func init() {
 	templates = template.Must(template.ParseFiles(signupTemplatePath, forgotPasswordTemplatePath))
 
 	authenticationTokenRepository = &repository.DynamodbAuthenticationTokenRepository{Dynamodb: db}
-}
-
-type SignUpMessage struct {
-	ConfirmUrl string
-}
-
-type ForgotPasswordMessage struct {
-	ConfirmUrl string
-}
-
-func BuildSignupMessage(m SignUpMessage) (*bytes.Buffer, error) {
-	var bodyBuffer bytes.Buffer
-
-	err := templates.ExecuteTemplate(&bodyBuffer, "signup-template.html", m)
-	if err != nil {
-		return nil, err
-	}
-
-	return &bodyBuffer, nil
-}
-
-func BuildForgotPasswordMessage(m ForgotPasswordMessage) (*bytes.Buffer, error) {
-	var bodyBuffer bytes.Buffer
-
-	err := templates.ExecuteTemplate(&bodyBuffer, "forgot-password-template.html", m)
-	if err != nil {
-		return nil, err
-	}
-
-	return &bodyBuffer, nil
 }
 
 func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoEventUserPoolsCustomMessage, error) {
