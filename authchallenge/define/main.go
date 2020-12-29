@@ -1,9 +1,10 @@
 package main
 
 import (
+	"os"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"os"
 )
 
 // 「認証チャレンジの定義 Lambda」 この後に 「認証チャレンジの作成 Lambda」（authchallenge/create/main.go）が呼ばれる

@@ -26,3 +26,4 @@ test:
 
 format:
 	gofmt -l -s -w .
+	goimports -w -l ./

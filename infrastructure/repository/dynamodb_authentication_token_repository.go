@@ -1,12 +1,13 @@
 package repository
 
 import (
+	"os"
+	"strings"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/aws/aws-sdk-go/service/dynamodb/dynamodbattribute"
 	"github.com/keitakn/go-cognito-lambda/domain"
-	"os"
-	"strings"
 )
 
 type DynamodbAuthenticationTokenRepository struct {

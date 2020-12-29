@@ -1,15 +1,16 @@
 package repository
 
 import (
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/keitakn/go-cognito-lambda/domain"
-	"github.com/keitakn/go-cognito-lambda/infrastructure"
-	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/keitakn/go-cognito-lambda/domain"
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+	"github.com/keitakn/go-cognito-lambda/test"
 )
 
 var db *dynamodb.DynamoDB

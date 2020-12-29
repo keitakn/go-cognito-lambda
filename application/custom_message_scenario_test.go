@@ -1,12 +1,13 @@
 package application
 
 import (
-	"github.com/keitakn/go-cognito-lambda/domain"
 	"html/template"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/keitakn/go-cognito-lambda/domain"
 )
 
 var templates *template.Template

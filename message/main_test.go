@@ -1,12 +1,13 @@
 package main
 
 import (
-	"github.com/keitakn/go-cognito-lambda/infrastructure"
-	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
 	"os"
 	"reflect"
 	"testing"
+
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+	"github.com/keitakn/go-cognito-lambda/test"
 
 	"github.com/aws/aws-lambda-go/events"
 )

@@ -1,6 +1,11 @@
 package main
 
 import (
+	"html/template"
+	"log"
+	"os"
+	"time"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
@@ -8,10 +13,6 @@ import (
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/infrastructure"
 	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
-	"html/template"
-	"log"
-	"os"
-	"time"
 )
 
 var templates *template.Template
