@@ -57,7 +57,12 @@ func TestHandler(t *testing.T) {
 		}
 
 		m := BuildMessage{
-			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + code + "&sub=" + tokensCreator.CognitoSub + "&authenticationToken=" + tokensCreator.Token,
+			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" +
+				code +
+				"&sub=" +
+				tokensCreator.CognitoSub +
+				"&authenticationToken=" +
+				tokensCreator.Token,
 		}
 
 		expected, err := createExpectedSignUpMessage(m)

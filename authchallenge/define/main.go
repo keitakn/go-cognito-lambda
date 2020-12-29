@@ -9,7 +9,9 @@ import (
 
 // 「認証チャレンジの定義 Lambda」 この後に 「認証チャレンジの作成 Lambda」（authchallenge/create/main.go）が呼ばれる
 // https://docs.aws.amazon.com/ja_jp/cognito/latest/developerguide/user-pool-lambda-define-auth-challenge.html
-func Handler(event events.CognitoEventUserPoolsDefineAuthChallenge) (events.CognitoEventUserPoolsDefineAuthChallenge, error) {
+func Handler(
+	event events.CognitoEventUserPoolsDefineAuthChallenge,
+) (events.CognitoEventUserPoolsDefineAuthChallenge, error) {
 	targetUserPoolId := os.Getenv("TARGET_USER_POOL_ID")
 	if targetUserPoolId != event.UserPoolID {
 		return event, nil

@@ -63,7 +63,9 @@ func (h *DynamodbHelper) CreateTestAuthenticationTokensTable() error {
 }
 
 func (h *DynamodbHelper) DeleteTestAuthenticationTokensTable() error {
-	deleteTableInput := &dynamodb.DeleteTableInput{TableName: aws.String(strings.Title(os.Getenv("DEPLOY_STAGE")) + "AuthenticationTokens")}
+	deleteTableInput := &dynamodb.DeleteTableInput{
+		TableName: aws.String(strings.Title(os.Getenv("DEPLOY_STAGE")) + "AuthenticationTokens"),
+	}
 
 	if _, err := h.Dynamodb.DeleteTable(deleteTableInput); err != nil {
 		return err

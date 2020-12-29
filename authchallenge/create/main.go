@@ -9,7 +9,9 @@ import (
 // event.Response.PublicChallengeParameters["challenge"] の値はクライアントに渡される
 // event.Response.PrivateChallengeParameters["answer"] の値は「認証チャレンジレスポンスの確認 Lambda」（authchallenge/verify/main.go）に渡される
 // https://docs.aws.amazon.com/ja_jp/cognito/latest/developerguide/user-pool-lambda-create-auth-challenge.html
-func Handler(event events.CognitoEventUserPoolsCreateAuthChallenge) (events.CognitoEventUserPoolsCreateAuthChallenge, error) {
+func Handler(
+	event events.CognitoEventUserPoolsCreateAuthChallenge,
+) (events.CognitoEventUserPoolsCreateAuthChallenge, error) {
 	event.Response.PublicChallengeParameters = map[string]string{}
 	event.Response.PrivateChallengeParameters = map[string]string{}
 

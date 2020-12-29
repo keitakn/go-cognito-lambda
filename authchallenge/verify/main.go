@@ -26,7 +26,9 @@ func init() {
 	authenticationTokenRepository = &repository.DynamodbAuthenticationTokenRepository{Dynamodb: db}
 }
 
-func Handler(event events.CognitoEventUserPoolsVerifyAuthChallenge) (events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
+func Handler(
+	event events.CognitoEventUserPoolsVerifyAuthChallenge,
+) (events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
 	targetUserPoolId := os.Getenv("TARGET_USER_POOL_ID")
 	if targetUserPoolId != event.UserPoolID {
 		return event, nil
