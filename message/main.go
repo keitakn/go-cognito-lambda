@@ -19,6 +19,7 @@ var templates *template.Template
 var db *dynamodb.DynamoDB
 var authenticationTokenRepository domain.AuthenticationTokenRepository
 
+//nolint:gochecknoinits
 func init() {
 	signupTemplatePath := "bin/signup-template.html"
 	forgotPasswordTemplatePath := "bin/forgot-password-template.html"

@@ -23,6 +23,7 @@ type ResponseBody struct {
 
 var svc *cognitoidentityprovider.CognitoIdentityProvider
 
+//nolint:gochecknoinits
 func init() {
 	svc = cognitoidentityprovider.New(session.New(), &aws.Config{
 		Region: aws.String(os.Getenv("REGION")),
