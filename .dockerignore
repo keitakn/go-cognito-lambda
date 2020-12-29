@@ -1,0 +1,6 @@
+node_modules
+.envrc
+.gitignore
+package.json
+package-lock.json
+serverless.yml
