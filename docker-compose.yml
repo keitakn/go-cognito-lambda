@@ -19,6 +19,7 @@ services:
       TRIGGER_USER_POOL_NAME: ${TRIGGER_USER_POOL_NAME}
       REGION: ${REGION}
       KIMONO_APP_FRONTEND_URL: ${KIMONO_APP_FRONTEND_URL}
+      DYNAMODB_TEST_ENDPOINT: http://dynamodb:8000
     depends_on:
       - dynamodb
 volumes:

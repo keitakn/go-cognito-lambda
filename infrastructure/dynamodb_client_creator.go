@@ -24,7 +24,7 @@ func (c *DynamodbClientCreator) CreateTestClient() *dynamodb.DynamoDB {
 	}))
 
 	return dynamodb.New(sess, &aws.Config{
-		Endpoint:    aws.String("http://localhost:58000"),
+		Endpoint:    aws.String(os.Getenv("DYNAMODB_TEST_ENDPOINT")),
 		Region:      aws.String(os.Getenv("REGION")),
 		Credentials: credentials.NewStaticCredentials("dummy", "dummy", "dummy"),
 	})
