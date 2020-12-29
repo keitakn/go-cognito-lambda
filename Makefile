@@ -1,4 +1,4 @@
-.PHONY: build clean deploy test
+.PHONY: build clean deploy test lint format
 
 build:
 	GOOS=linux GOARCH=amd64 go build -o bin/message ./message
@@ -23,6 +23,10 @@ remove:
 test:
 	go clean -testcache
 	go test -v $$(go list ./... | grep -v /node_modules/)
+
+lint:
+	go vet ./...
+	golangci-lint run ./...
 
 format:
 	gofmt -l -s -w .
