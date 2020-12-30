@@ -38,7 +38,7 @@ func Handler(
 	event.Response.AnswerCorrect = false
 
 	requestAuthenticationToken, ok := event.Request.ChallengeAnswer.(string)
-	if ok == false {
+	if !ok {
 		return event, nil
 	}
 
