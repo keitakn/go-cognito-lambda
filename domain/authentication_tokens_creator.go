@@ -6,6 +6,8 @@ import (
 	"github.com/google/uuid"
 )
 
+const expireMinute int64 = 10
+
 type AuthenticationTokensCreator struct {
 	Token         string
 	CognitoSub    string
@@ -25,7 +27,7 @@ func (c *AuthenticationTokensCreator) Create() (*AuthenticationTokens, error) {
 		token = randomToken.String()
 	}
 
-	expirationTime := c.Time.Add(10 * time.Minute)
+	expirationTime := c.Time.Add(time.Duration(expireMinute) * time.Minute)
 
 	return &AuthenticationTokens{
 		Token:          token,

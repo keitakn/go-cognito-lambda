@@ -6,6 +6,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
@@ -44,7 +46,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
-			StatusCode: 400,
+			StatusCode: infrastructure.BadRequest,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -67,7 +69,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
+			StatusCode: infrastructure.InternalServerError,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -82,7 +84,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 	resBodyJson, _ := json.Marshal(resBody)
 
 	res := events.APIGatewayV2HTTPResponse{
-		StatusCode: 200,
+		StatusCode: infrastructure.Ok,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
