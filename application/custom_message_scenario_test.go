@@ -23,6 +23,7 @@ func TestMain(m *testing.M) {
 	os.Exit(status)
 }
 
+//nolint:funlen
 func TestHandler(t *testing.T) {
 	t.Run("Successful BuildSignupMessage", func(t *testing.T) {
 		tokensCreator := domain.AuthenticationTokensCreator{

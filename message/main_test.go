@@ -32,6 +32,7 @@ func TestMain(m *testing.M) {
 	os.Exit(status)
 }
 
+//nolint:funlen
 func TestHandler(t *testing.T) {
 	// TriggerSourceが 'CustomMessage_SignUp' の場合はCustomMessageが返却される
 	t.Run("Return Signup CustomMessage", func(t *testing.T) {

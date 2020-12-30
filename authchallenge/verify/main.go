@@ -14,6 +14,7 @@ import (
 var db *dynamodb.DynamoDB
 var authenticationTokenRepository domain.AuthenticationTokenRepository
 
+//nolint:gochecknoinits
 func init() {
 	dynamodbClientCreator := infrastructure.DynamodbClientCreator{}
 
