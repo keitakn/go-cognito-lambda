@@ -15,6 +15,7 @@ export TARGET_USER_POOL_ID=ターゲットとなるUserPoolのID
 export TRIGGER_USER_POOL_NAME=ターゲットとなるUserPoolの名前
 export REGION=AWSのリージョン（.eg. ap-northeast-1）
 export NEXT_IDAAS_SERVER_CLIENT_ID=クライアントシークレットを安全に保管出来るサーバーサイドアプリケーション用のUserPoolClientIDを指定
+export DYNAMODB_TEST_ENDPOINT=テスト用のDynamoDBのエンドポイントを指定、ローカルで実行する時は http://localhost:58000 を指定
 ```
 
 ## AWSクレデンシャルの設定
@@ -45,6 +46,12 @@ aws_secret_access_key=YOUR_AWS_SECRET_ACCESS_KEY
 
 `npm ci` を実行してpackageをインストールします。
 
+## Dockerで必要なコンテナを生成する
+
+`docker-compose up -d` で必要なコンテナを起動して下さい。
+
+ソースコードのフォーマットやDynamoDBを使ったテストはDocker上でないと正常動作しません。
+
 # デプロイ関連のコマンド
 
 ## Build & Deploy
@@ -67,11 +74,23 @@ deployは [Serverless Framework](https://www.serverless.com/) を利用してい
 
 ## テスト実行
 
-`make test`
+Goのコンテナ内で `make test` を実行します。
+
+`docker-compose exec go make test` でも大丈夫です。
 
 ## ソースコードのformat
 
-`make format`
+Goのコンテナ内で `make format` を実行します。
+
+`docker-compose exec go make format` でも大丈夫です。
+
+## Lintの実行
+
+`make format` では修正出来ないエラー内容を表示します。
+
+Goのコンテナ内で `make lint` を実行します。
+
+`docker-compose exec go make lint` でも大丈夫です。
 
 # 開発を行う為の参考資料
 
