@@ -65,7 +65,9 @@ func handler(request events.CognitoEventUserPoolsCustomMessage) (events.CognitoE
 	return request, nil
 }
 
-func createSignupMessageResponse(request events.CognitoEventUserPoolsCustomMessage) events.CognitoEventUserPoolsCustomMessageResponse {
+func createSignupMessageResponse(
+	request events.CognitoEventUserPoolsCustomMessage,
+) events.CognitoEventUserPoolsCustomMessageResponse {
 	subscribeNews := false
 	if sendSubscribeNews, ok := request.Request.ClientMetadata["subscribeNews"]; ok {
 		if sendSubscribeNews == "1" {
@@ -101,7 +103,9 @@ func createSignupMessageResponse(request events.CognitoEventUserPoolsCustomMessa
 	return signupMessageResponse
 }
 
-func forgotPasswordMessageResponse(request events.CognitoEventUserPoolsCustomMessage) events.CognitoEventUserPoolsCustomMessageResponse {
+func forgotPasswordMessageResponse(
+	request events.CognitoEventUserPoolsCustomMessage,
+) events.CognitoEventUserPoolsCustomMessageResponse {
 	authenticationTokensCreator := domain.AuthenticationTokensCreator{
 		CognitoSub: request.UserName,
 		Time:       time.Now(),
