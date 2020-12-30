@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
 	"os"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -25,7 +26,13 @@ var svc *cognitoidentityprovider.CognitoIdentityProvider
 
 //nolint:gochecknoinits
 func init() {
-	svc = cognitoidentityprovider.New(session.New(), &aws.Config{
+	sess, err := session.NewSession()
+	if err != nil {
+		// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+		log.Fatalln(err)
+	}
+
+	svc = cognitoidentityprovider.New(sess, &aws.Config{
 		Region: aws.String(os.Getenv("REGION")),
 	})
 }
