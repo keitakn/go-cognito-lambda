@@ -2,8 +2,9 @@ package application
 
 import (
 	"bytes"
-	"github.com/keitakn/go-cognito-lambda/domain"
 	"html/template"
+
+	"github.com/keitakn/go-cognito-lambda/domain"
 )
 
 type CustomMessageScenario struct {
@@ -36,7 +37,12 @@ func (s *CustomMessageScenario) BuildSignupMessage(p SignUpMessageBuildParams) (
 	}
 
 	m := BuildMessage{
-		ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + p.Code + "&sub=" + s.AuthenticationTokensCreator.CognitoSub + "&authenticationToken=" + authenticationTokens.Token,
+		ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" +
+			p.Code +
+			"&sub=" +
+			s.AuthenticationTokensCreator.CognitoSub +
+			"&authenticationToken=" +
+			authenticationTokens.Token,
 	}
 
 	var bodyBuffer bytes.Buffer
@@ -47,9 +53,16 @@ func (s *CustomMessageScenario) BuildSignupMessage(p SignUpMessageBuildParams) (
 	return bodyBuffer.String(), nil
 }
 
-func (s *CustomMessageScenario) BuildForgotPasswordMessage(p ForgotPasswordMessageBuildParams) (body string, string error) {
+func (
+	s *CustomMessageScenario,
+) BuildForgotPasswordMessage(
+	p ForgotPasswordMessageBuildParams,
+) (body string, string error) {
 	m := BuildMessage{
-		ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=" + p.Code + "&sub=" + s.AuthenticationTokensCreator.CognitoSub,
+		ConfirmUrl: "http://localhost:3900/cognito/password/reset/confirm?code=" +
+			p.Code +
+			"&sub=" +
+			s.AuthenticationTokensCreator.CognitoSub,
 	}
 
 	var bodyBuffer bytes.Buffer

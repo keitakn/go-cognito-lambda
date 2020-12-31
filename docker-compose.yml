@@ -4,3 +4,24 @@ services:
     image: amazon/dynamodb-local
     ports:
       - "58000:8000"
+  go:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    restart: always
+    command: 'tail -f /dev/null'
+    volumes:
+      - ./:/go/app
+      - node_modules:/go/app/node_modules
+    environment:
+      DEPLOY_STAGE: ${DEPLOY_STAGE}
+      TARGET_USER_POOL_ID: ${TARGET_USER_POOL_ID}
+      TRIGGER_USER_POOL_NAME: ${TRIGGER_USER_POOL_NAME}
+      REGION: ${REGION}
+      KIMONO_APP_FRONTEND_URL: ${KIMONO_APP_FRONTEND_URL}
+      DYNAMODB_TEST_ENDPOINT: http://dynamodb:8000
+    depends_on:
+      - dynamodb
+volumes:
+  node_modules:
+    driver: 'local'

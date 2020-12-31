@@ -1,12 +1,13 @@
 package application
 
 import (
-	"github.com/keitakn/go-cognito-lambda/domain"
 	"html/template"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/keitakn/go-cognito-lambda/domain"
 )
 
 var templates *template.Template
@@ -22,6 +23,7 @@ func TestMain(m *testing.M) {
 	os.Exit(status)
 }
 
+//nolint:funlen
 func TestHandler(t *testing.T) {
 	t.Run("Successful BuildSignupMessage", func(t *testing.T) {
 		tokensCreator := domain.AuthenticationTokensCreator{
@@ -56,7 +58,12 @@ func TestHandler(t *testing.T) {
 		}
 
 		m := BuildMessage{
-			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" + code + "&sub=" + tokensCreator.CognitoSub + "&authenticationToken=" + tokensCreator.Token,
+			ConfirmUrl: "http://localhost:3900/cognito/signup/confirm?code=" +
+				code +
+				"&sub=" +
+				tokensCreator.CognitoSub +
+				"&authenticationToken=" +
+				tokensCreator.Token,
 		}
 
 		expected, err := createExpectedSignUpMessage(m)

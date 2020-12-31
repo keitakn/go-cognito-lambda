@@ -1,11 +1,12 @@
 package infrastructure
 
 import (
+	"os"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"os"
 )
 
 type DynamodbClientCreator struct{}
@@ -24,7 +25,7 @@ func (c *DynamodbClientCreator) CreateTestClient() *dynamodb.DynamoDB {
 	}))
 
 	return dynamodb.New(sess, &aws.Config{
-		Endpoint:    aws.String("http://localhost:58000"),
+		Endpoint:    aws.String(os.Getenv("DYNAMODB_TEST_ENDPOINT")),
 		Region:      aws.String(os.Getenv("REGION")),
 		Credentials: credentials.NewStaticCredentials("dummy", "dummy", "dummy"),
 	})

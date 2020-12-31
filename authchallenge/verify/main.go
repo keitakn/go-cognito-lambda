@@ -1,18 +1,20 @@
 package main
 
 import (
+	"os"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/infrastructure"
 	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
-	"os"
 )
 
 var db *dynamodb.DynamoDB
 var authenticationTokenRepository domain.AuthenticationTokenRepository
 
+//nolint:gochecknoinits
 func init() {
 	dynamodbClientCreator := infrastructure.DynamodbClientCreator{}
 
@@ -25,7 +27,9 @@ func init() {
 	authenticationTokenRepository = &repository.DynamodbAuthenticationTokenRepository{Dynamodb: db}
 }
 
-func Handler(event events.CognitoEventUserPoolsVerifyAuthChallenge) (events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
+func Handler(
+	event events.CognitoEventUserPoolsVerifyAuthChallenge,
+) (events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
 	targetUserPoolId := os.Getenv("TARGET_USER_POOL_ID")
 	if targetUserPoolId != event.UserPoolID {
 		return event, nil
@@ -34,7 +38,7 @@ func Handler(event events.CognitoEventUserPoolsVerifyAuthChallenge) (events.Cogn
 	event.Response.AnswerCorrect = false
 
 	requestAuthenticationToken, ok := event.Request.ChallengeAnswer.(string)
-	if ok == false {
+	if !ok {
 		return event, nil
 	}
 

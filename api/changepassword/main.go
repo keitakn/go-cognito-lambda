@@ -3,12 +3,16 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"log"
+	"os"
+
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
-	"os"
 )
 
 type RequestBody struct {
@@ -22,8 +26,15 @@ type ResponseBody struct {
 
 var svc *cognitoidentityprovider.CognitoIdentityProvider
 
+//nolint:gochecknoinits
 func init() {
-	svc = cognitoidentityprovider.New(session.New(), &aws.Config{
+	sess, err := session.NewSession()
+	if err != nil {
+		// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+		log.Fatalln(err)
+	}
+
+	svc = cognitoidentityprovider.New(sess, &aws.Config{
 		Region: aws.String(os.Getenv("REGION")),
 	})
 }
@@ -35,7 +46,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
-			StatusCode: 400,
+			StatusCode: infrastructure.BadRequest,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -58,7 +69,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 		resBodyJson, _ := json.Marshal(resBody)
 
 		res := events.APIGatewayV2HTTPResponse{
-			StatusCode: 500,
+			StatusCode: infrastructure.InternalServerError,
 			Headers: map[string]string{
 				"Content-Type": "application/json",
 			},
@@ -73,7 +84,7 @@ func Handler(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.AP
 	resBodyJson, _ := json.Marshal(resBody)
 
 	res := events.APIGatewayV2HTTPResponse{
-		StatusCode: 200,
+		StatusCode: infrastructure.Ok,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},

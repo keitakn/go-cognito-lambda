@@ -1,31 +1,23 @@
 package repository
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/credentials"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
-	"github.com/keitakn/go-cognito-lambda/domain"
-	"github.com/keitakn/go-cognito-lambda/test"
 	"log"
 	"os"
 	"reflect"
 	"testing"
 	"time"
+
+	"github.com/aws/aws-sdk-go/service/dynamodb"
+	"github.com/keitakn/go-cognito-lambda/domain"
+	"github.com/keitakn/go-cognito-lambda/infrastructure"
+	"github.com/keitakn/go-cognito-lambda/test"
 )
 
 var db *dynamodb.DynamoDB
 
 func TestMain(m *testing.M) {
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
-
-	db = dynamodb.New(sess, &aws.Config{
-		Endpoint:    aws.String("http://localhost:58000"),
-		Region:      aws.String(os.Getenv("REGION")),
-		Credentials: credentials.NewStaticCredentials("dummy", "dummy", "dummy"),
-	})
+	dynamodbClientCreator := infrastructure.DynamodbClientCreator{}
+	db = dynamodbClientCreator.CreateTestClient()
 
 	dynamodbHelper := test.DynamodbHelper{Dynamodb: db}
 

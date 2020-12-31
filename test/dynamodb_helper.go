@@ -1,10 +1,11 @@
 package test
 
 import (
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/service/dynamodb"
 	"os"
 	"strings"
+
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/service/dynamodb"
 )
 
 type DynamodbHelper struct {
@@ -62,7 +63,9 @@ func (h *DynamodbHelper) CreateTestAuthenticationTokensTable() error {
 }
 
 func (h *DynamodbHelper) DeleteTestAuthenticationTokensTable() error {
-	deleteTableInput := &dynamodb.DeleteTableInput{TableName: aws.String(strings.Title(os.Getenv("DEPLOY_STAGE")) + "AuthenticationTokens")}
+	deleteTableInput := &dynamodb.DeleteTableInput{
+		TableName: aws.String(strings.Title(os.Getenv("DEPLOY_STAGE")) + "AuthenticationTokens"),
+	}
 
 	if _, err := h.Dynamodb.DeleteTable(deleteTableInput); err != nil {
 		return err

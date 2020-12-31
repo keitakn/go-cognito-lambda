@@ -2,8 +2,9 @@ package application
 
 import (
 	"bytes"
-	"github.com/keitakn/go-cognito-lambda/domain"
 	"html/template"
+
+	"github.com/keitakn/go-cognito-lambda/domain"
 )
 
 type MockAuthenticationTokenRepository struct {

@@ -12,7 +12,9 @@ type createUserPoolsCustomMessageEventParams struct {
 	CodeParameter string
 }
 
-func createUserPoolsCustomMessageEvent(p *createUserPoolsCustomMessageEventParams) *events.CognitoEventUserPoolsCustomMessage {
+func createUserPoolsCustomMessageEvent(
+	p *createUserPoolsCustomMessageEventParams,
+) *events.CognitoEventUserPoolsCustomMessage {
 	cc := &events.CognitoEventUserPoolsCallerContext{
 		AWSSDKVersion: "",
 		ClientID:      "",
