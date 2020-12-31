@@ -22,7 +22,7 @@ remove:
 
 test:
 	go clean -testcache
-	go test -v $$(go list ./... | grep -v /node_modules/)
+	go test -p 1 -v $$(go list ./... | grep -v /node_modules/)
 
 lint:
 	go vet ./...
