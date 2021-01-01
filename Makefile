@@ -1,4 +1,4 @@
-.PHONY: build clean deploy test lint format
+.PHONY: build clean deploy test test-ci lint format
 
 build:
 	GOOS=linux GOARCH=amd64 go build -o bin/message ./message
@@ -23,6 +23,10 @@ remove:
 test:
 	go clean -testcache
 	go test -p 1 -v $$(go list ./... | grep -v /node_modules/)
+
+test-ci:
+	go clean -testcache
+	go test -p 1 -v -coverprofile coverage.out -covermode atomic $$(go list ./... | grep -v /node_modules/)
 
 lint:
 	go vet ./...
