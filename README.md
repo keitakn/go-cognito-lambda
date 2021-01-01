@@ -1,4 +1,7 @@
 # go-cognito-lambda
+![ci-master](https://github.com/keitakn/go-cognito-lambda/workflows/ci-master/badge.svg)
+[![Coverage Status](https://coveralls.io/repos/github/keitakn/go-cognito-lambda/badge.svg?branch=master)](https://coveralls.io/github/keitakn/go-cognito-lambda?branch=master)
+
 CognitoUserPoolをトリガーとしたLambdaのサンプル色々
 
 # Getting Started
