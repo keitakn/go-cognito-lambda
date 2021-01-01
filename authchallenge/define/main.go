@@ -25,15 +25,21 @@ func Handler(
 		event.Response.ChallengeName = "CUSTOM_CHALLENGE"
 		event.Response.FailAuthentication = false
 		event.Response.IssueTokens = false
-	} else if sessionCnt > 0 && event.Request.Session[sessionCnt-1].ChallengeResult {
+
+		return event, nil
+	}
+
+	if sessionCnt > 0 && event.Request.Session[sessionCnt-1].ChallengeResult {
 		// カスタム認証に成功した場合
 		event.Response.FailAuthentication = false
 		event.Response.IssueTokens = true
-	} else {
-		// カスタム認証に失敗した場合
-		event.Response.FailAuthentication = true
-		event.Response.IssueTokens = false
+
+		return event, nil
 	}
+
+	// カスタム認証に失敗した場合
+	event.Response.FailAuthentication = true
+	event.Response.IssueTokens = false
 
 	return event, nil
 }
