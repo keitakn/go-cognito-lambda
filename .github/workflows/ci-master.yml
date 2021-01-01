@@ -1,4 +1,4 @@
-name: Go
+name: ci-master
 
 on:
   push:
@@ -20,7 +20,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Docker set up
         run: |
-          cp .air.normal.conf .air.conf
           docker-compose up --build -d
       - name: Execute test
         run: |
