@@ -9,16 +9,10 @@ jobs:
   deploy:
     name: Deploy To Staging And Development
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     strategy:
       matrix:
-        include:
-          - node-version: 12.x
-            deploy-stage: dev
-            target-user-pool-id: ${{ secrets.DEV_TARGET_USER_POOL_ID }}
-            trigger-user-pool-name: ${{ secrets.DEV_TRIGGER_USER_POOL_NAME }}
-            aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
-            next-idaas-server-client-id: ${{ secrets.DEV_NEXT_IDAAS_SERVER_CLIENT_ID }}
+        node-version: [12.x]
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -30,18 +24,18 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ matrix.aws-access-key-id }}
-          aws-secret-access-key: ${{ matrix.aws-secret-access-key }}
+          aws-access-key-id: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ secrets.REGION }}
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
           go-version: ^1.15
-      - name: Deploy To AWS
+      - name: Deploy To AWS(dev)
         env:
-          DEPLOY_STAGE: ${{ matrix.deploy-stage }}
-          TARGET_USER_POOL_ID: ${{ matrix.target-user-pool-id }}
-          TRIGGER_USER_POOL_NAME: ${{ matrix.trigger-user-pool-name }}
-          NEXT_IDAAS_SERVER_CLIENT_ID: ${{ matrix.next-idaas-server-client-id }}
+          DEPLOY_STAGE: dev
+          TARGET_USER_POOL_ID: ${{ secrets.DEV_TARGET_USER_POOL_ID }}
+          TRIGGER_USER_POOL_NAME: ${{ secrets.DEV_TRIGGER_USER_POOL_NAME }}
+          NEXT_IDAAS_SERVER_CLIENT_ID: ${{ secrets.DEV_NEXT_IDAAS_SERVER_CLIENT_ID }}
         run: |
           make deploy
