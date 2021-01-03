@@ -35,8 +35,11 @@ jobs:
         env:
           DEPLOY_STAGE: dev
           REGION: ${{ secrets.REGION }}
+          DEV_AWS_ACCESS_KEY_ID: ${{ secrets.DEV_AWS_ACCESS_KEY_ID }}
+          DEV_AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_AWS_SECRET_ACCESS_KEY }}
           TARGET_USER_POOL_ID: ${{ secrets.DEV_TARGET_USER_POOL_ID }}
           TRIGGER_USER_POOL_NAME: ${{ secrets.DEV_TRIGGER_USER_POOL_NAME }}
           NEXT_IDAAS_SERVER_CLIENT_ID: ${{ secrets.DEV_NEXT_IDAAS_SERVER_CLIENT_ID }}
         run: |
+          npm run set:dev-aws-credentials
           make deploy

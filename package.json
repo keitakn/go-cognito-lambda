@@ -4,7 +4,8 @@
   "description": "Cognito UserPool Custom Lambda Sample",
   "scripts": {
     "deploy": "serverless deploy -v",
-    "remove": "serverless remove -v"
+    "remove": "serverless remove -v",
+    "set:dev-aws-credentials" : "serverless config credentials --provider aws --key $DEV_AWS_ACCESS_KEY_ID --secret $DEV_AWS_SECRET_ACCESS_KEY --profile nekochans-dev"
   },
   "repository": {
     "type": "git",
