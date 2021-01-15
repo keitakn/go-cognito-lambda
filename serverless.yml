@@ -65,6 +65,7 @@ custom:
     endpointType: "regional"
     securityPolicy: tls_1_2
     apiType: http
+    autoDomain: true
 
 package:
   exclude:
