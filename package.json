@@ -5,7 +5,9 @@
   "scripts": {
     "deploy": "serverless deploy -v",
     "remove": "serverless remove -v",
-    "set:dev-aws-credentials" : "serverless config credentials --provider aws --key $DEV_AWS_ACCESS_KEY_ID --secret $DEV_AWS_SECRET_ACCESS_KEY --profile nekochans-dev"
+    "set:dev-aws-credentials": "serverless config credentials --provider aws --key $DEV_AWS_ACCESS_KEY_ID --secret $DEV_AWS_SECRET_ACCESS_KEY --profile nekochans-dev",
+    "dev:domain:create": "serverless create_domain --aws-profile nekochans-dev",
+    "dev:domain:delete": "serverless delete_domain --aws-profile nekochans-dev"
   },
   "repository": {
     "type": "git",
@@ -18,7 +20,8 @@
   },
   "homepage": "https://github.com/keitakn/go-cognito-lambda#readme",
   "devDependencies": {
-    "serverless": "^2.15.0",
+    "serverless": "^2.18.0",
+    "serverless-domain-manager": "^5.1.0",
     "serverless-prune-plugin": "^1.4.3"
   }
 }
