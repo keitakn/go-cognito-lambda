@@ -18,6 +18,8 @@ export DEPLOY_STAGE=デプロイターゲット（.eg. dev, stg, prod）
 export TARGET_USER_POOL_ID=ターゲットとなるUserPoolのID
 export TRIGGER_USER_POOL_NAME=ターゲットとなるUserPoolの名前
 export REGION=AWSのリージョン（.eg. ap-northeast-1）
+export API_DOMAIN_NAME=API Gatewayに設定するドメイン名を指定、予めRoute53にホストゾーンが設定されている必要があります
+export CERTIFICATE_ARN=AWS Certificate ManagerのARNを指定、 "*.ドメイン名" で指定した証明書は利用出来ないので注意
 export NEXT_IDAAS_SERVER_CLIENT_ID=クライアントシークレットを安全に保管出来るサーバーサイドアプリケーション用のUserPoolClientIDを指定
 export DYNAMODB_TEST_ENDPOINT=テスト用のDynamoDBのエンドポイントを指定、ローカルで実行する時は http://localhost:58000 を指定
 ```
@@ -182,7 +184,7 @@ curl -v \
   "newPassword": "新しいパスワード"
 }
 ' \
-https://xxxxx.execute-api.ap-northeast-1.amazonaws.com/users/passwords | jq
+https://${API_DOMAIN_NAME}/users/passwords | jq
 ```
 
 トークンが有効な間は正常に200系のレスポンスが返ってきます。

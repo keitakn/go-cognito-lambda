@@ -4,6 +4,7 @@ frameworkVersion: '>=2.0.0 <3.0.0'
 
 plugins:
   - serverless-prune-plugin
+  - serverless-domain-manager
 
 provider:
   name: aws
@@ -37,6 +38,8 @@ provider:
     DEPLOY_STAGE: ${env:DEPLOY_STAGE}
     TARGET_USER_POOL_ID: ${env:TARGET_USER_POOL_ID}
     REGION: ${env:REGION}
+    API_DOMAIN_NAME: ${env:API_DOMAIN_NAME}
+    CERTIFICATE_ARN: ${env:CERTIFICATE_ARN}
   httpApi:
     cors: true
     authorizers:
@@ -53,6 +56,16 @@ custom:
   prune:
     automatic: true
     number: 3
+  customDomain:
+    domainName: ${self:provider.environment.API_DOMAIN_NAME}
+    stage: ${self:provider.stage}
+    basePath: ""
+    certificateArn: ${self:provider.environment.CERTIFICATE_ARN}
+    createRoute53Record: true
+    endpointType: "regional"
+    securityPolicy: tls_1_2
+    apiType: http
+    autoDomain: true
 
 package:
   exclude:
