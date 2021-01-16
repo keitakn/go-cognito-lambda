@@ -40,6 +40,8 @@ jobs:
           TARGET_USER_POOL_ID: ${{ secrets.DEV_TARGET_USER_POOL_ID }}
           TRIGGER_USER_POOL_NAME: ${{ secrets.DEV_TRIGGER_USER_POOL_NAME }}
           NEXT_IDAAS_SERVER_CLIENT_ID: ${{ secrets.DEV_NEXT_IDAAS_SERVER_CLIENT_ID }}
+          API_DOMAIN_NAME: ${{ secrets.DEV_API_DOMAIN_NAME }}
+          CERTIFICATE_ARN: ${{ secrets.DEV_CERTIFICATE_ARN }}
         run: |
           npm run set:dev-aws-credentials
           make deploy
