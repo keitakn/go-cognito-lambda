@@ -85,7 +85,19 @@ func Handler(
 
 	if !*user.Enabled {
 		statusCode := infrastructure.BadRequest
-		errorMessage := "Cognito User Status Not Enabled"
+		errorMessage := "Cognito User Status is Not Enabled"
+
+		resBody := &ResponseErrorBody{Message: errorMessage}
+		resBodyJson, _ := json.Marshal(resBody)
+
+		res := createApiGatewayV2Response(statusCode, resBodyJson)
+
+		return res, nil
+	}
+
+	if *user.UserStatus == "UNCONFIRMED" {
+		statusCode := infrastructure.BadRequest
+		errorMessage := "Cognito User Status is UNCONFIRMED"
 
 		resBody := &ResponseErrorBody{Message: errorMessage}
 		resBodyJson, _ := json.Marshal(resBody)
