@@ -112,6 +112,12 @@ functions:
             name: adminJwtAuthorizer
             scopes:
               - ${env:DEPLOY_STAGE}-cognito-admin-api.keitakn.de/admin
+  fetchCognitoUser:
+    handler: bin/fetchcognitouser
+    events:
+      - httpApi:
+          method: GET
+          path: /users/{cognitoSub}
 
 resources:
   Resources:
