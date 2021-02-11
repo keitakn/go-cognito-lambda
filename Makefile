@@ -11,6 +11,7 @@ build:
 	GOOS=linux GOARCH=amd64 go build -o bin/createauthchallenge ./authchallenge/create/main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/verifyauthchallenge ./authchallenge/verify/main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/fetchcognitouser ./api/fetchcognitouser/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/signup ./api/signup/main.go
 
 clean:
 	rm -rf ./bin

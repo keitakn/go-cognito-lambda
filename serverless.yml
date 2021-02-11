@@ -118,6 +118,12 @@ functions:
       - httpApi:
           method: GET
           path: /users/{cognitoSub}
+  signUp:
+    handler: bin/signup
+    events:
+      - httpApi:
+          method: POST
+          path: /signup
 
 resources:
   Resources:
