@@ -77,8 +77,18 @@ func Handler(
 
 	_, err := svc.ConfirmSignUp(input)
 	if err != nil {
-		// TODO 本来はライブラリのエラーメッセージをそのまま返してはいけない、適切なエラーメッセージに変換して返す事を推奨
-		errorMessage := err.Error()
+		errorMessage := ""
+
+		switch errorMessage {
+		case "CodeMismatchException: Invalid verification code provided, please try again.":
+			errorMessage = "確認コードが一致しません、もう一度試して下さい。"
+		case "ExpiredCodeException: Invalid code provided, please request a code again.":
+			// 違うCognitoSubが指定された場合でもこのエラーメッセージが返ってくる
+			errorMessage = "確認コードが無効、または有効期限切れです。"
+		default:
+			// TODO 本来はライブラリのエラーメッセージをそのまま返してはいけない、適切なエラーメッセージに変換して返す事を推奨
+			errorMessage = err.Error()
+		}
 
 		resBody := &ResponseErrorBody{Message: errorMessage}
 		resBodyJson, _ := json.Marshal(resBody)
