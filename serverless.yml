@@ -124,6 +124,12 @@ functions:
       - httpApi:
           method: POST
           path: /signup
+  signUpConfirm:
+    handler: bin/signupconfirm
+    events:
+      - httpApi:
+          method: PATCH
+          path: /signup/confirm
 
 resources:
   Resources:
