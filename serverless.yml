@@ -130,6 +130,12 @@ functions:
       - httpApi:
           method: PATCH
           path: /signup/confirm
+  signInPassword:
+    handler: bin/signinpassword
+    events:
+      - httpApi:
+          method: POST
+          path: /signin/password
 
 resources:
   Resources:
