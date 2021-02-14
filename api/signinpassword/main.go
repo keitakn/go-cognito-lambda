@@ -3,8 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
+
+	"github.com/keitakn/go-cognito-lambda/domain"
+	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -20,10 +24,20 @@ type RequestBody struct {
 	Password         string `json:"password"`
 }
 
+type IdTokenDetail struct {
+	Jwt     string                `json:"jwt"`
+	Payload domain.CognitoIdToken `json:"payload"`
+}
+
+type AccessTokenDetail struct {
+	Jwt     string                    `json:"jwt"`
+	Payload domain.CognitoAccessToken `json:"payload"`
+}
+
 type ResponseCreatedBody struct {
-	IdToken      string `json:"idToken"`
-	AccessToken  string `json:"accessToken"`
-	RefreshToken string `json:"refreshToken"`
+	IdToken      IdTokenDetail     `json:"idToken"`
+	AccessToken  AccessTokenDetail `json:"accessToken"`
+	RefreshToken string            `json:"refreshToken"`
 }
 
 type ResponseErrorBody struct {
@@ -31,6 +45,8 @@ type ResponseErrorBody struct {
 }
 
 var svc *cognitoidentityprovider.CognitoIdentityProvider
+var cognitoJwkRepository domain.CognitoJwkRepository
+var iss string
 
 //nolint:gochecknoinits
 func init() {
@@ -43,6 +59,16 @@ func init() {
 	svc = cognitoidentityprovider.New(sess, &aws.Config{
 		Region: aws.String(os.Getenv("REGION")),
 	})
+
+	iss = fmt.Sprintf(
+		"https://cognito-idp.%v.amazonaws.com/%v",
+		os.Getenv("REGION"),
+		os.Getenv("TARGET_USER_POOL_ID"),
+	)
+
+	cognitoJwkRepository = &repository.HttpCognitoJwkRepository{
+		Iss: iss,
+	}
 }
 
 func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGatewayV2HTTPResponse {
@@ -93,11 +119,64 @@ func Handler(
 		return res, nil
 	}
 
+	jwkSet, err := cognitoJwkRepository.Fetch()
+	if err != nil {
+		errorMessage := err.Error()
+
+		resBody := &ResponseErrorBody{Message: errorMessage}
+		resBodyJson, _ := json.Marshal(resBody)
+
+		res := createApiGatewayV2Response(infrastructure.BadRequest, resBodyJson)
+
+		return res, nil
+	}
+
+	cognitoJwtToken := &domain.CognitoJwtToken{
+		Iss:    iss,
+		Aud:    reqBody.UserPoolClientId,
+		JwkSet: jwkSet,
+	}
+
+	idTokenPayload, err := cognitoJwtToken.ParseAndValidateIdToken(*resp.AuthenticationResult.IdToken)
+	if err != nil {
+		errorMessage := err.Error()
+
+		resBody := &ResponseErrorBody{Message: errorMessage}
+		resBodyJson, _ := json.Marshal(resBody)
+
+		res := createApiGatewayV2Response(infrastructure.BadRequest, resBodyJson)
+
+		return res, nil
+	}
+
+	idTokenDetail := &IdTokenDetail{
+		Jwt:     *resp.AuthenticationResult.IdToken,
+		Payload: *idTokenPayload,
+	}
+
+	accessTokenPayload, err := cognitoJwtToken.ParseAndValidateAccessToken(*resp.AuthenticationResult.AccessToken)
+	if err != nil {
+		errorMessage := err.Error()
+
+		resBody := &ResponseErrorBody{Message: errorMessage}
+		resBodyJson, _ := json.Marshal(resBody)
+
+		res := createApiGatewayV2Response(infrastructure.BadRequest, resBodyJson)
+
+		return res, nil
+	}
+
+	accessTokenDetail := &AccessTokenDetail{
+		Jwt:     *resp.AuthenticationResult.AccessToken,
+		Payload: *accessTokenPayload,
+	}
+
 	resBody := &ResponseCreatedBody{
-		IdToken:      *resp.AuthenticationResult.IdToken,
-		AccessToken:  *resp.AuthenticationResult.AccessToken,
+		IdToken:      *idTokenDetail,
+		AccessToken:  *accessTokenDetail,
 		RefreshToken: *resp.AuthenticationResult.RefreshToken,
 	}
+
 	resBodyJson, _ := json.Marshal(resBody)
 
 	res := createApiGatewayV2Response(infrastructure.Ok, resBodyJson)
