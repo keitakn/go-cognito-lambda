@@ -7,6 +7,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/lestrrat-go/jwx/jwk"
+
 	"github.com/keitakn/go-cognito-lambda/domain"
 	"github.com/keitakn/go-cognito-lambda/infrastructure/repository"
 
@@ -45,8 +47,8 @@ type ResponseErrorBody struct {
 }
 
 var svc *cognitoidentityprovider.CognitoIdentityProvider
-var cognitoJwkRepository domain.CognitoJwkRepository
 var iss string
+var jwkSet jwk.Set
 
 //nolint:gochecknoinits
 func init() {
@@ -66,9 +68,17 @@ func init() {
 		os.Getenv("TARGET_USER_POOL_ID"),
 	)
 
-	cognitoJwkRepository = &repository.HttpCognitoJwkRepository{
+	cognitoJwkRepository := &repository.HttpCognitoJwkRepository{
 		Iss: iss,
 	}
+
+	res, err := cognitoJwkRepository.Fetch()
+	if err != nil {
+		// TODO ここでエラーが発生した場合、致命的な問題が起きているのでちゃんとしたログを出すように改修する
+		log.Fatalln(err)
+	}
+
+	jwkSet = res
 }
 
 func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGatewayV2HTTPResponse {
@@ -84,6 +94,8 @@ func createApiGatewayV2Response(statusCode int, resBodyJson []byte) events.APIGa
 	return res
 }
 
+// TODO リファクタリングするまでの間、一時的に関数が大きい状態を許容する
+//nolint:funlen
 func Handler(
 	ctx context.Context, req events.APIGatewayV2HTTPRequest,
 ) (events.APIGatewayV2HTTPResponse, error) {
@@ -109,18 +121,6 @@ func Handler(
 	resp, err := svc.InitiateAuth(input)
 	if err != nil {
 		// TODO 本来はライブラリのエラーメッセージをそのまま返してはいけない、適切なエラーメッセージに変換して返す事を推奨
-		errorMessage := err.Error()
-
-		resBody := &ResponseErrorBody{Message: errorMessage}
-		resBodyJson, _ := json.Marshal(resBody)
-
-		res := createApiGatewayV2Response(infrastructure.BadRequest, resBodyJson)
-
-		return res, nil
-	}
-
-	jwkSet, err := cognitoJwkRepository.Fetch()
-	if err != nil {
 		errorMessage := err.Error()
 
 		resBody := &ResponseErrorBody{Message: errorMessage}
