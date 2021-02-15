@@ -13,6 +13,7 @@ build:
 	GOOS=linux GOARCH=amd64 go build -o bin/fetchcognitouser ./api/fetchcognitouser/main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/signup ./api/signup/main.go
 	GOOS=linux GOARCH=amd64 go build -o bin/signupconfirm ./api/signupconfirm/main.go
+	GOOS=linux GOARCH=amd64 go build -o bin/signinpassword ./api/signinpassword/main.go
 
 clean:
 	rm -rf ./bin
