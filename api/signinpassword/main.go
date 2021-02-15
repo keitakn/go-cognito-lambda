@@ -181,7 +181,7 @@ func Handler(
 
 	resBodyJson, _ := json.Marshal(resBody)
 
-	res := createApiGatewayV2Response(infrastructure.Ok, resBodyJson)
+	res := createApiGatewayV2Response(infrastructure.Created, resBodyJson)
 
 	return res, nil
 }
