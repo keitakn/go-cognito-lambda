@@ -131,13 +131,13 @@ func Handler(
 		return res, nil
 	}
 
-	cognitoJwtToken := &domain.CognitoJwtToken{
+	cognitoJwtTokenRepository := &repository.JwxCognitoJwtTokenRepository{
 		Iss:    iss,
 		Aud:    reqBody.UserPoolClientId,
 		JwkSet: jwkSet,
 	}
 
-	idTokenPayload, err := cognitoJwtToken.ParseAndValidateIdToken(*resp.AuthenticationResult.IdToken)
+	idTokenPayload, err := cognitoJwtTokenRepository.ParseAndValidateIdToken(*resp.AuthenticationResult.IdToken)
 	if err != nil {
 		errorMessage := err.Error()
 
@@ -154,7 +154,9 @@ func Handler(
 		Payload: *idTokenPayload,
 	}
 
-	accessTokenPayload, err := cognitoJwtToken.ParseAndValidateAccessToken(*resp.AuthenticationResult.AccessToken)
+	accessTokenPayload, err := cognitoJwtTokenRepository.ParseAndValidateAccessToken(
+		*resp.AuthenticationResult.AccessToken,
+	)
 	if err != nil {
 		errorMessage := err.Error()
 
