@@ -89,7 +89,7 @@ func Handler(
 		resBody := &ResponseErrorBody{Message: errorMessage}
 		resBodyJson, _ := json.Marshal(resBody)
 
-		res := createApiGatewayV2Response(infrastructure.BadRequest, resBodyJson)
+		res := createApiGatewayV2Response(infrastructure.InternalServerError, resBodyJson)
 
 		return res, nil
 	}
