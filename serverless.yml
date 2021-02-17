@@ -136,6 +136,12 @@ functions:
       - httpApi:
           method: POST
           path: /signin/password
+  passwordReset:
+    handler: bin/passwordreset
+    events:
+      - httpApi:
+          method: POST
+          path: /password/reset
 
 resources:
   Resources:
