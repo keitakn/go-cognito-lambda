@@ -142,6 +142,12 @@ functions:
       - httpApi:
           method: POST
           path: /password/reset
+  passwordResetConfirm:
+    handler: bin/passwordresetconfirm
+    events:
+      - httpApi:
+          method: PATCH
+          path: /password/reset/confirm
 
 resources:
   Resources:
