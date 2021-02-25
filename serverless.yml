@@ -102,6 +102,13 @@ functions:
           pool: ${env:TRIGGER_USER_POOL_NAME}
           trigger: VerifyAuthChallengeResponse
           existing: true
+  migrateUser:
+    handler: bin/migrateuser
+    events:
+      - cognitoUserPool:
+          pool: ${env:TRIGGER_USER_POOL_NAME}
+          trigger: UserMigration
+          existing: true
   changePassword:
     handler: bin/changepassword
     events:
@@ -190,6 +197,15 @@ resources:
         Action: "lambda:InvokeFunction"
         FunctionName:
           Fn::GetAtt: [ "VerifyAuthChallengeLambdaFunction", "Arn"]
+        Principal: "cognito-idp.amazonaws.com"
+        SourceArn:
+          Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
+    OnCognitoMigrateUserLambdaPermission:
+      Type: "AWS::Lambda::Permission"
+      Properties:
+        Action: "lambda:InvokeFunction"
+        FunctionName:
+          Fn::GetAtt: [ "MigrateUserLambdaFunction", "Arn"]
         Principal: "cognito-idp.amazonaws.com"
         SourceArn:
           Fn::Join: [ "", [ "arn:aws:cognito-idp", ":", Ref: "AWS::Region", ":", Ref: "AWS::AccountId", ":", "userpool/", "${env:TARGET_USER_POOL_ID}" ] ]
